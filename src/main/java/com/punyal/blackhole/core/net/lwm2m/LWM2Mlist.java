@@ -23,6 +23,7 @@
  */
 package com.punyal.blackhole.core.net.lwm2m;
 
+import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.net.EndPoint;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +33,11 @@ import java.util.List;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class LWM2Mlist {
+    private final IncomingDataBase incomingDB;
     private final List<LWM2Mdevice> list;
 
-    public LWM2Mlist() {
+    public LWM2Mlist(IncomingDataBase incomingDB) {
+        this.incomingDB = incomingDB;
         list = new ArrayList<>();
     }
     
@@ -52,8 +55,9 @@ public class LWM2Mlist {
     
     public void addDevice(String name, String id, String host, int port) {
         LWM2Mdevice device = new LWM2Mdevice(new EndPoint(host, port), name, id);
-        device.setAlive();
+        device.setAlive(incomingDB);
         list.add(device);
+        
         //System.out.println("New device added: "+name);
     }
     

@@ -23,6 +23,7 @@
  */
 package com.punyal.blackhole.core.net.lwm2m;
 
+import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.net.EndPoint;
 import java.net.InetAddress;
 
@@ -34,14 +35,14 @@ public class LWM2Mserver {
     private final EndPoint endPoint;
     private final LWM2Mlist devicesList;
     
-    public LWM2Mserver(InetAddress address, int port) {
+    public LWM2Mserver(IncomingDataBase incomingDB, InetAddress address, int port) {
         endPoint = new EndPoint(address, port);
-        devicesList = new LWM2Mlist();
+        devicesList = new LWM2Mlist(incomingDB);
     }
     
-    public LWM2Mserver(String host, int port) {
+    public LWM2Mserver(IncomingDataBase incomingDB, String host, int port) {
         endPoint = new EndPoint(host, port);
-        devicesList = new LWM2Mlist();
+        devicesList = new LWM2Mlist(incomingDB);
     }
     
     public void start() {

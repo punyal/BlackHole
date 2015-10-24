@@ -21,24 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.constants;
+package com.punyal.blackhole.core.data;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class ConstantsNet {
-    public ConstantsNet(){}
+public class StrainData {
+    public final String name;
+    public final long timestamp;
+    public final int alarm;
+    public final int strain;
     
-    // CoAP
-    public static final int COAP_DEFAULT_PORT = 5683;
-    public static final String COAP_RESOURCE_STRAIN = "/strain";
-    public static final String COAP_RESOURCE_RMS = "/acc/rms";
-    
-    // LWM2M
-    public static final String LWM2M_SERVER_IP = "localhost";
-    public static final int LWM2M_SERVER_PORT = COAP_DEFAULT_PORT;
-    public static final String LWM2M_SERVER_RESOURCE_RD = "/rd";
-    public static final int LWM2M_TIMEOUT = 35000; // 35s
-    
+    public StrainData(String name, long timestamp, int alarm, int strain) {
+        this.name = name;
+        this.timestamp = timestamp;
+        this.alarm = alarm;
+        this.strain = strain;
+    }
 }

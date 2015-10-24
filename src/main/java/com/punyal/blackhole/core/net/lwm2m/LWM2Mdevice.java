@@ -24,6 +24,8 @@
 package com.punyal.blackhole.core.net.lwm2m;
 
 import static com.punyal.blackhole.constants.ConstantsNet.LWM2M_TIMEOUT;
+import com.punyal.blackhole.core.data.IncomingData;
+import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.net.EndPoint;
 import com.punyal.blackhole.core.net.rockbolt.RockboltClient;
 
@@ -39,6 +41,7 @@ public class LWM2Mdevice {
     private long lastUpdate;
     private boolean connected;
     private RockboltClient rockboltClient;
+    private IncomingDataBase incomingDB;
     
     public LWM2Mdevice(EndPoint endPoint, String name, String id) {
         this.endPoint = endPoint;
@@ -46,6 +49,7 @@ public class LWM2Mdevice {
         this.id = id;
         lastUpdate = System.currentTimeMillis();
         connected = false;
+        incomingDB = null;
     }
     
     public EndPoint getEndPoint() {
@@ -66,10 +70,10 @@ public class LWM2Mdevice {
     
     public void updateID(String id) {
         this.id = id;
-        setAlive();
+        setAlive(incomingDB);
     }
     
-    public void setAlive() {
+    public void setAlive(IncomingDataBase incomingDB) {
         if (!connected) {
             connected = true;
             //run here a new thread!!
@@ -80,12 +84,20 @@ public class LWM2Mdevice {
             }
             rockboltClient = new RockboltClient(this);
             rockboltClient.startThread();
+            this.incomingDB = incomingDB;
         }
         lastUpdate = System.currentTimeMillis();
     }
     
     public void setDead() {
         connected = false;
+        rockboltClient.stopThread();
+    }
+    
+    public void incomingData(String resource, String response) {
+        if (incomingDB != null) {
+            incomingDB.addData(new IncomingData(name, resource, response));
+        }
     }
 
 }

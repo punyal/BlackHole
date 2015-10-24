@@ -23,8 +23,10 @@
  */
 package com.punyal.blackhole.core.net.rockbolt;
 
-import static com.punyal.blackhole.constants.ConstantsNet.LWM2M_TIMEOUT;
+import static com.punyal.blackhole.constants.ConstantsNet.*;
+import com.punyal.blackhole.core.net.CoapObserver;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import org.eclipse.californium.core.CoapResponse;
 
 
 /**
@@ -34,20 +36,51 @@ import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
 public class RockboltClient extends Thread {
     private final  LWM2Mdevice device;
     private boolean running;
+    private final CoapObserver strainObserver;
+    private final CoapObserver rmsObserver;
     
     
-    public RockboltClient(LWM2Mdevice device) {
+    public RockboltClient(final LWM2Mdevice device) {
         this.device = device;
         this.setDaemon(true);
         running = true;
+        strainObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_STRAIN) {
+            
+            @Override
+            public void incomingData(CoapResponse response) {
+                device.incomingData(COAP_RESOURCE_STRAIN, response.getResponseText());
+            }
+            
+            @Override
+            public void error() {
+                System.out.println("No data");
+            }
+        };
+        rmsObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_RMS) {
+            
+            @Override
+            public void incomingData(CoapResponse response) {
+                device.incomingData(COAP_RESOURCE_RMS, response.getResponseText());
+            }
+            
+            @Override
+            public void error() {
+                System.out.println("No data");
+            }
+        };
     }
     
     public void startThread() {
-        this.start();
+        start();
+        //System.out.println("starting observe");
+        strainObserver.startObserve();
+        rmsObserver.startObserve();
     }
     
     public void stopThread() {
         running = false;
+        strainObserver.stopObserver();
+        rmsObserver.stopObserver();
     }
     
     @Override

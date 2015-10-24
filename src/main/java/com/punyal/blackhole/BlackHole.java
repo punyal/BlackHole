@@ -23,22 +23,36 @@
  */
 package com.punyal.blackhole;
 
-import com.punyal.blackhole.core.Core;
+import static com.punyal.blackhole.constants.ConstantsNet.*;
+import com.punyal.blackhole.core.control.Analyzer;
+import com.punyal.blackhole.core.data.IncomingDataBase;
+import com.punyal.blackhole.core.data.RMSdataBase;
+import com.punyal.blackhole.core.data.StrainDataBase;
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mserver;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class BlackHole implements Runnable {
-    private final Core core;
+    private final IncomingDataBase incomingDB;
+    private final StrainDataBase strainDB;
+    private final RMSdataBase rmsDB;
+    private final LWM2Mserver lwm2mServer;
+    private final Analyzer analyzer;
     
     public BlackHole() {
-        core = new Core();
+        incomingDB = new IncomingDataBase();
+        strainDB = new StrainDataBase();
+        rmsDB = new RMSdataBase();
+        lwm2mServer = new LWM2Mserver(incomingDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
+        analyzer = new Analyzer(incomingDB, strainDB, rmsDB);
+        analyzer.startThread();
     }
     
     public void start() {
         System.out.println("ShakeIT: Starting...");
-        core.start();
+        lwm2mServer.start();
         run();
     }
 
@@ -46,9 +60,10 @@ public class BlackHole implements Runnable {
     public void run() {
         try {
             while (true) {
-                //System.out.println("");
+                System.out.println("IncomingDB:"+incomingDB.size()+" StrainDB:"+strainDB.size()+" rmsDB:"+rmsDB.size());
+                //rmsDB.printAll();
                 try {
-                    Thread.sleep(2000); // Sleep 1s
+                    Thread.sleep(1000); // Sleep 1s
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt(); // This should kill it propertly
                 }

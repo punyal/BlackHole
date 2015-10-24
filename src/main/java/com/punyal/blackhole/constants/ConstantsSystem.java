@@ -21,24 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core;
-
-import static com.punyal.blackhole.constants.ConstantsNet.*;
-import com.punyal.blackhole.core.net.lwm2m.LWM2Mserver;
+package com.punyal.blackhole.constants;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class Core {
-    private final LWM2Mserver lwm2mServer;
+public class ConstantsSystem {
+    public ConstantsSystem(){}
     
-    public Core() {
-        lwm2mServer = new LWM2Mserver(LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
-    }
-    
-    public void start() {
-        lwm2mServer.start();
-    }
+    // BlackHole
+    public static final int DATA_BASE_BUFFER_TIME = 30000; // 30 s
+    public static final int DATA_BASE_MAX_SIZE = 20;
     
 }

@@ -21,24 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.constants;
+package com.punyal.blackhole.core.data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class ConstantsNet {
-    public ConstantsNet(){}
+public class IncomingDataBase {
+    private final List<IncomingData> list;
     
-    // CoAP
-    public static final int COAP_DEFAULT_PORT = 5683;
-    public static final String COAP_RESOURCE_STRAIN = "/strain";
-    public static final String COAP_RESOURCE_RMS = "/acc/rms";
+    public IncomingDataBase() {
+        list = new ArrayList<>();
+    }
     
-    // LWM2M
-    public static final String LWM2M_SERVER_IP = "localhost";
-    public static final int LWM2M_SERVER_PORT = COAP_DEFAULT_PORT;
-    public static final String LWM2M_SERVER_RESOURCE_RD = "/rd";
-    public static final int LWM2M_TIMEOUT = 35000; // 35s
+    public int size() {
+        return list.size();
+    }
+
+    public void addData(IncomingData incomingData) {
+        list.add(incomingData);
+    }
+    
+    private void remove(IncomingData incomingData) {
+        list.remove(incomingData);
+    }
+    
+    public IncomingData getFirst() {
+        if (list.isEmpty())
+            return null;
+        
+        IncomingData data = list.get(0);
+        list.remove(0);
+        return data;
+    }
     
 }

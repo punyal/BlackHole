@@ -23,11 +23,36 @@
  */
 package com.punyal.blackhole.utils;
 
+import java.util.Iterator;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
+
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class Parsers {
-    
+    public static JSONObject senml2json(String s) {
+        JSONObject json, tmp;
+        String data;
+        
+        json = new JSONObject();
+        try {
+            tmp = (JSONObject) JSONValue.parse(s);
+
+            // Save base time
+            json.put("time", tmp.get("bt"));
+
+            JSONArray slideContent = (JSONArray)tmp.get("e");
+            Iterator i = slideContent.iterator();
+
+            while (i.hasNext()) {
+                JSONObject slide = (JSONObject) i.next();
+                json.put(slide.get("n"), slide.get("v"));
+            }
+        } catch (NullPointerException e) {}
+        return json;
+    }
 }
