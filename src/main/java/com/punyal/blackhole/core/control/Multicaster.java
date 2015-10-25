@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.data;
+package com.punyal.blackhole.core.control;
 
-import static com.punyal.blackhole.constants.ConstantsSystem.DATA_BASE_MAX_SIZE;
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,33 +32,32 @@ import java.util.List;
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class IncomingDataBase {
-    private final List<IncomingData> list;
+public class Multicaster {
+    private final LWM2Mlist devicesList;
     
-    public IncomingDataBase() {
-        list = new ArrayList<>();
+    public Multicaster(LWM2Mlist devicesList) {
+        this.devicesList = devicesList;
     }
     
-    public int size() {
-        return list.size();
-    }
-
-    public void addData(IncomingData incomingData) {
-        if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
-        list.add(incomingData);
-    }
-    
-    private void remove(IncomingData incomingData) {
-        list.remove(incomingData);
-    }
-    
-    public IncomingData getFirst() {
-        if (list.isEmpty())
-            return null;
+    public void newMulticaster(List<String> exceptDevices, String resource, int alarmLevel) {
+        boolean send;
+        Caster caster;
+        List<LWM2Mdevice> toSendList =new ArrayList<>();
         
-        IncomingData data = list.get(0);
-        list.remove(0);
-        return data;
+        for (LWM2Mdevice device: devicesList.getDevices()) {
+            send = true;
+            for (String except: exceptDevices) {
+                if (except.equals(device.getName()))
+                    send = false;
+            }
+            if (send) toSendList.add(device);
+        }
+        
+        for (LWM2Mdevice device: toSendList) {
+            System.out.println(device.getName());
+            caster = new Caster(device, resource, alarmLevel);
+            caster.startThread();
+        }
+        
     }
-    
 }

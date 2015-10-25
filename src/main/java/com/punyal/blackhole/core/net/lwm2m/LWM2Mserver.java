@@ -55,4 +55,8 @@ public class LWM2Mserver {
         lwm2mSnifer.start();
     }
     
+    public LWM2Mlist getDevices() {
+        return devicesList;
+    }
+    
 }

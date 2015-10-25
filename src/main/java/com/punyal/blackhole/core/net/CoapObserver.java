@@ -69,7 +69,7 @@ public abstract class CoapObserver {
     
     public void stopObserver() {
         //System.out.println("Stoping Observe: "+coapClient.getURI());
-        relation.reactiveCancel();
+        if (relation!=null) relation.reactiveCancel();
     }
     
     abstract public void incomingData(CoapResponse response);

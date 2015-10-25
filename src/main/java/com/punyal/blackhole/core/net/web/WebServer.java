@@ -21,43 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.data;
+package com.punyal.blackhole.core.net.web;
 
-import static com.punyal.blackhole.constants.ConstantsSystem.DATA_BASE_MAX_SIZE;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.eclipse.jetty.server.Server;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class IncomingDataBase {
-    private final List<IncomingData> list;
-    
-    public IncomingDataBase() {
-        list = new ArrayList<>();
-    }
-    
-    public int size() {
-        return list.size();
-    }
-
-    public void addData(IncomingData incomingData) {
-        if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
-        list.add(incomingData);
-    }
-    
-    private void remove(IncomingData incomingData) {
-        list.remove(incomingData);
-    }
-    
-    public IncomingData getFirst() {
-        if (list.isEmpty())
-            return null;
+public class WebServer {
+ 
+    public WebServer() {
+        Server server = new Server(80);
+        server.setHandler(new WebHandler());
+ 
+        try {
+            server.start();
+            server.join();
+        } catch (Exception ex) {
+            System.out.println("WebError: "+ ex);
+        }
         
-        IncomingData data = list.get(0);
-        list.remove(0);
-        return data;
     }
     
 }

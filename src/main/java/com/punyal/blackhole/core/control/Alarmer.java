@@ -21,59 +21,63 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole;
+package com.punyal.blackhole.core.control;
 
 import static com.punyal.blackhole.constants.ConstantsNet.*;
-import com.punyal.blackhole.core.control.Analyzer;
-import com.punyal.blackhole.core.data.IncomingDataBase;
-import com.punyal.blackhole.core.data.RMSdataBase;
-import com.punyal.blackhole.core.data.StrainDataBase;
-import com.punyal.blackhole.core.net.lwm2m.LWM2Mserver;
-import com.punyal.blackhole.core.net.web.WebServer;
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class BlackHole implements Runnable {
-    private final IncomingDataBase incomingDB;
-    private final StrainDataBase strainDB;
-    private final RMSdataBase rmsDB;
-    private final LWM2Mserver lwm2mServer;
-    private final Analyzer analyzer;
-    private final WebServer webServer;
+public class Alarmer extends Thread {
+    private final AlarmCollector alarmRMS;
+    private final Multicaster multicaster;
     
-    public BlackHole() {
-        incomingDB = new IncomingDataBase();
-        strainDB = new StrainDataBase();
-        rmsDB = new RMSdataBase();
-        lwm2mServer = new LWM2Mserver(incomingDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
-        analyzer = new Analyzer(incomingDB, strainDB, rmsDB, lwm2mServer.getDevices());
-        analyzer.startThread();
-        webServer = new WebServer();
+    public Alarmer(LWM2Mlist devicesList) {
+        alarmRMS = new AlarmCollector();
+        multicaster = new Multicaster(devicesList);
+        setDaemon(true);
     }
     
-    public void start() {
-        System.out.println("ShakeIT: Starting...");
-        lwm2mServer.start();
-        run();
+    public void startThread() {
+        start();
     }
-
+    
+    public void newAlarm(String resource, String name, int alarmLevel, long timestamp) {
+        switch(resource) {
+            case COAP_RESOURCE_STRAIN:
+                break;
+            case COAP_RESOURCE_RMS:
+                alarmRMS.add(name, alarmLevel, timestamp);
+                break;
+            default:break;
+        }
+        
+    }
+    
     @Override
     public void run() {
         try {
             while (true) {
-                //System.out.println("IncomingDB:"+incomingDB.size()+" StrainDB:"+strainDB.size()+" rmsDB:"+rmsDB.size());
-                //rmsDB.printAll();
+                
+                if (alarmRMS.isTimeout()) {
+                    System.out.print("RMS alarm level"+alarmRMS.getAlarmLevel()+" except to [");
+                    for (String name: alarmRMS.getNames())
+                        System.out.print(name+" ");
+                    System.out.print("]\n");
+                    multicaster.newMulticaster(alarmRMS.getNames(), COAP_RESOURCE_RMS, alarmRMS.getAlarmLevel());
+                    alarmRMS.clear();
+                }
+                
                 try {
-                    Thread.sleep(1000); // Sleep 1s
+                    Thread.sleep(100); // Sleep 1s
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt(); // This should kill it propertly
                 }
             }
         } finally {
-            System.out.println("Sniffer dead!");
+            System.out.println("Killing Alarm!");
         }
     }
-    
 }

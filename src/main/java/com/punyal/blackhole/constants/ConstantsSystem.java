@@ -30,8 +30,15 @@ package com.punyal.blackhole.constants;
 public class ConstantsSystem {
     public ConstantsSystem(){}
     
-    // BlackHole
+    // DB
     public static final int DATA_BASE_BUFFER_TIME = 30000; // 30 s
     public static final int DATA_BASE_MAX_SIZE = 20;
+    
+    // COMMUNICATIONS
+    public static final int ALARM_GROUP_TIME = 1000; // 1s
+    
+    // ALARMS
+    public static final String ALARM_MESSAGE_RMS_LEVEL_1="LED:3,400,5";
+    public static final String ALARM_MESSAGE_RMS_LEVEL_2="LED:3,100,30";
     
 }

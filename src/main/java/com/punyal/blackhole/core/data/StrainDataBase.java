@@ -23,6 +23,7 @@
  */
 package com.punyal.blackhole.core.data;
 
+import static com.punyal.blackhole.constants.ConstantsSystem.DATA_BASE_MAX_SIZE;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,7 @@ public class StrainDataBase {
     }
 
     public void addData(StrainData strainData) {
+        if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
         list.add(strainData);
     }
     

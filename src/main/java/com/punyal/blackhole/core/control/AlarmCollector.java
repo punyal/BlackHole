@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.data;
+package com.punyal.blackhole.core.control;
 
-import static com.punyal.blackhole.constants.ConstantsSystem.DATA_BASE_MAX_SIZE;
+import static com.punyal.blackhole.constants.ConstantsSystem.ALARM_GROUP_TIME;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,33 +31,46 @@ import java.util.List;
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class IncomingDataBase {
-    private final List<IncomingData> list;
+public class AlarmCollector {
+    private long timestamp;
+    private int alarmLevel;
+    private List<String> names;
     
-    public IncomingDataBase() {
-        list = new ArrayList<>();
+    public AlarmCollector() {
+        timestamp = 0;
+        alarmLevel = 0;
+        names = new ArrayList<>();
     }
     
-    public int size() {
-        return list.size();
-    }
-
-    public void addData(IncomingData incomingData) {
-        if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
-        list.add(incomingData);
+    public void clear() {
+        timestamp = 0;
+        alarmLevel = 0;
+        names = new ArrayList<>();
     }
     
-    private void remove(IncomingData incomingData) {
-        list.remove(incomingData);
+    public void add(String name, int alarmLevel, long timestamp) {
+        if (this.timestamp == 0) this.timestamp = timestamp;
+        if (alarmLevel > this.alarmLevel) this.alarmLevel = alarmLevel;
+        names.add(name);
     }
     
-    public IncomingData getFirst() {
-        if (list.isEmpty())
-            return null;
-        
-        IncomingData data = list.get(0);
-        list.remove(0);
-        return data;
+    public long getTimestamp() {
+        return timestamp;
+    }
+    
+    public boolean isTimeout() {
+        if (timestamp == 0) return false;
+        if ((System.currentTimeMillis()-timestamp) > ALARM_GROUP_TIME)
+            return true;
+        return false;
+    }
+    
+    public int getAlarmLevel() {
+        return alarmLevel;
+    }
+    
+    public List<String> getNames() {
+        return names;
     }
     
 }

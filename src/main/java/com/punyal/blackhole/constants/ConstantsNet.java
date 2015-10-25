@@ -32,13 +32,15 @@ public class ConstantsNet {
     
     // CoAP
     public static final int COAP_DEFAULT_PORT = 5683;
-    public static final String COAP_RESOURCE_STRAIN = "/strain";
+    public static final String COAP_RESOURCE_STRAIN = "/3999/0/5500";
     public static final String COAP_RESOURCE_RMS = "/acc/rms";
+    public static final String COAP_RESOURCE_ROCKBOLT = "/Rockbolt";
+    public static final String COAP_RESOURCE_BOLTFAILURE = "/3200/0/5500";
     
     // LWM2M
     public static final String LWM2M_SERVER_IP = "localhost";
     public static final int LWM2M_SERVER_PORT = COAP_DEFAULT_PORT;
     public static final String LWM2M_SERVER_RESOURCE_RD = "/rd";
-    public static final int LWM2M_TIMEOUT = 35000; // 35s
+    public static final int LWM2M_TIMEOUT = 40000; // 35s
     
 }

@@ -21,43 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.data;
+package com.punyal.blackhole.core.net.web;
 
-import static com.punyal.blackhole.constants.ConstantsSystem.DATA_BASE_MAX_SIZE;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class IncomingDataBase {
-    private final List<IncomingData> list;
-    
-    public IncomingDataBase() {
-        list = new ArrayList<>();
+public class WebHandler extends AbstractHandler{
+    @Override
+    public void handle(String target,
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("text/html;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println("<h1>Hello World</h1>");
     }
-    
-    public int size() {
-        return list.size();
-    }
-
-    public void addData(IncomingData incomingData) {
-        if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
-        list.add(incomingData);
-    }
-    
-    private void remove(IncomingData incomingData) {
-        list.remove(incomingData);
-    }
-    
-    public IncomingData getFirst() {
-        if (list.isEmpty())
-            return null;
-        
-        IncomingData data = list.get(0);
-        list.remove(0);
-        return data;
-    }
-    
 }

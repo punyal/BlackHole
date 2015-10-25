@@ -61,5 +61,9 @@ public class LWM2Mlist {
         //System.out.println("New device added: "+name);
     }
     
+    public List<LWM2Mdevice> getDevices() {
+        return list;
+    }
+    
     
 } 
