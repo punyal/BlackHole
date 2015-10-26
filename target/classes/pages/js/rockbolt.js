@@ -19,7 +19,7 @@ function getListOfRockBolts() {
 
     success: function (data) {
       $('#timeDate').text(data.time_date);
-      $('#rockBoltsConnected').text("0");
+      $('#rockBoltsConnected').text(data.connected_devices);
 
       console.log("success"+JSON.stringify(data));
     },

@@ -50,7 +50,7 @@ public class BlackHole implements Runnable {
         lwm2mServer = new LWM2Mserver(incomingDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
         analyzer = new Analyzer(incomingDB, strainDB, rmsDB, lwm2mServer.getDevices());
         analyzer.startThread();
-        webServer = new WebServer();
+        webServer = new WebServer(lwm2mServer.getDevices());
     }
     
     public void start() {

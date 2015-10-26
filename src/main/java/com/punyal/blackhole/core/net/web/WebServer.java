@@ -23,8 +23,7 @@
  */
 package com.punyal.blackhole.core.net.web;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import org.eclipse.jetty.server.Server;
 
 /**
@@ -34,9 +33,9 @@ import org.eclipse.jetty.server.Server;
 public class WebServer {
     private final Server server;
     
-    public WebServer() {
+    public WebServer(LWM2Mlist devicesList) {
         server = new Server(3000);
-        server.setHandler(new WebHandler());
+        server.setHandler(new WebHandler(devicesList));
         try {
             server.start();
             //server.join();

@@ -23,9 +23,9 @@
  */
 package com.punyal.blackhole.core.net.web;
 
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import static com.punyal.blackhole.core.net.web.MIMEtype.*;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -42,6 +42,12 @@ import org.json.simple.JSONObject;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class WebHandler extends AbstractHandler{
+    private final LWM2Mlist devicesList;
+    
+    public WebHandler(LWM2Mlist devicesList) {
+        this.devicesList = devicesList;
+    }
+    
     @Override
     public void handle(String target,
                        Request baseRequest,
@@ -119,7 +125,7 @@ public class WebHandler extends AbstractHandler{
                        HttpServletResponse response) throws IOException, ServletException {
         JSONObject json = new JSONObject();
         json.put("time_date", (new Date(System.currentTimeMillis())).toString());
-        json.put("message", "test");
+        json.put("connected_devices", ""+devicesList.size());
         
         response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
         response.setStatus(HttpServletResponse.SC_OK);
