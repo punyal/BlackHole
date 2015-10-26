@@ -23,12 +23,19 @@
  */
 package com.punyal.blackhole.core.net.web;
 
+import static com.punyal.blackhole.core.net.web.MIMEtype.*;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.json.simple.JSONObject;
 
 /**
  *
@@ -40,9 +47,84 @@ public class WebHandler extends AbstractHandler{
                        Request baseRequest,
                        HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType("text/html;charset=utf-8");
+        
+        // Check incoming target
+        WebFile webFile = new WebFile(target);
+        
+        // Check specific cases:
+        if (webFile.getExtension().isEmpty()) { // No extension
+            if (webFile.getFileName().isEmpty()) {
+                if (webFile.getFolder().equals("/")) { // Index
+                    webFile.setTarget("/index.html");
+                    fileResponse(webFile, baseRequest, request, response);
+                }
+                else fileNotFound(baseRequest, request, response);
+            } else { // AJAX jQuery handlers...
+                // listOfRockBolts
+                listOfRockBolts(baseRequest, request, response);
+                
+            }
+        } else {
+            fileResponse(webFile, baseRequest, request, response);
+        }
+        
+        System.out.println(webFile.toString());
+    }
+    
+    public void fileResponse(WebFile webFile,
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+       
+        
+        // Read the files and send the response
+        InputStream is = WebHandler.class.getResourceAsStream("/pages"+webFile.getFileRoute());
+        if (is == null) {
+            fileNotFound(baseRequest, request, response);
+        } else {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            String line;
+            StringBuilder data = new StringBuilder();
+            while ((line = reader.readLine()) != null) data.append(line);
+            response.setContentType(MIMEtype.getMIME(webFile.getExtension()));
+            response.setStatus(HttpServletResponse.SC_OK);
+            baseRequest.setHandled(true);
+            response.getWriter().println(data.toString());
+        }
+        
+        
+    }
+    
+    
+    public void fileNotFound(
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+        // Read the files and send the response
+        InputStream is = WebHandler.class.getResourceAsStream("/pages/404.html");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        String line;
+        StringBuilder data = new StringBuilder();
+        while ((line = reader.readLine()) != null) data.append(line);
+        response.setContentType(MIMEtype.getMIME(HTML_MIME_TYPE));
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
-        response.getWriter().println("<h1>Hello World</h1>");
+        response.getWriter().println(data.toString());
     }
+    
+    
+    public void listOfRockBolts(
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+        JSONObject json = new JSONObject();
+        json.put("time_date", (new Date(System.currentTimeMillis())).toString());
+        json.put("message", "test");
+        
+        response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println(json.toJSONString());
+    }
+    
 }

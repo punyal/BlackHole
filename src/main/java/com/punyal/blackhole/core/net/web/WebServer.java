@@ -32,18 +32,18 @@ import org.eclipse.jetty.server.Server;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class WebServer {
- 
+    private final Server server;
+    
     public WebServer() {
-        Server server = new Server(80);
+        server = new Server(3000);
         server.setHandler(new WebHandler());
- 
         try {
             server.start();
-            server.join();
+            //server.join();
         } catch (Exception ex) {
             System.out.println("WebError: "+ ex);
         }
-        
+        System.out.println(server.getURI());
     }
     
 }

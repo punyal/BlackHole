@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>Black Hole</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" lang="en" content="Black Hole is centralized control for IPSO Chanllenge">
+		<meta name="author" content="Pablo Puñal Pereira">
+		<meta name="robots" content="index, follow">
+
+		<!-- icons -->
+		<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+
+		<!-- Override CSS file - add your own CSS rules -->
+		<link rel="stylesheet" href="css/styles.css">
+		<script src="js/jquery-1.11.3.min.js"></script>
+		<script src="js/rockbolt.js"></script>
+
+		</script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1 class="header-heading">LWM2M & IPSO Smart Objects Visualization</h1>
+			</div>
+			<div class="content">
+				<div class="main">
+
+					<!-- Black Hole Server Info -->
+					<h2>Black Hole Server Info</h2>
+					<p id="timeDate"></p>
+					<p>RockBolts connected: <a id="rockBoltsConnected"></a></p>
+
+
+					<!-- Tables -->
+					<h3>RockBolts</h3>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Address</th>
+								<th>Graph</th>
+								<th>Torch</th>
+							</tr>
+						</thead>
+						<tbody id="listRockBolts">
+							<tr id="RockBolt-281">
+								<th>RockBolt-281</th>
+								<td>fdfd:0:0:0:180a:72d7:cdb2:98bc</td>
+								<td><a href="#" class="btnSmall">Select</a></td>
+								<td><a href="#" class="btnTiny" onclick="sendAlarm();">ON</a> <a href="#" class="btnTiny">OFF</a></td>
+							</tr>
+							<tr id="RockBolt-282">
+								<th>RockBolt-282</th>
+								<td>fdfd:0:0:0:180b:70d7:fdb4:9fbc</td>
+								<td><a href="#" class="btnSmall">Select</a></td>
+								<td><a href="#" class="btnTiny">ON</a> <a href="#" class="btnTiny">OFF</a></td>
+							</tr>
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+			<div class="footer">
+				&copy; Copyright 2015
+			</div>
+		</div>
+
+	</body>
+</html>

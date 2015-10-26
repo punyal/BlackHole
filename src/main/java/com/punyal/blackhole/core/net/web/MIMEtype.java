@@ -21,16 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole;
+package com.punyal.blackhole.core.net.web;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("BlackHole...");
-        BlackHole blackHole = new BlackHole();
-        blackHole.start();
+public class MIMEtype {
+    public static final String CSS_EXTENSION = ".css";
+    public static final String CSS_MIME_TYPE = "text/css";
+    public static final String HTML_EXTENSION = ".html";
+    public static final String HTML_MIME_TYPE = "text/html";
+    public static final String JAVA_SCRIPT_EXTENSION = ".js";
+    public static final String JAVA_SCRIPT_MIME_TYPE = "application/javascript";
+    public static final String JSON_EXTENSION = ".json";
+    public static final String JSON_MIME_TYPE = "application/json";
+    
+    // Default
+    public static final String DEFAULT_EXTENSION = HTML_EXTENSION;
+    public static final String DEFAULT_MIME_TYPE = HTML_MIME_TYPE;
+    
+    public static String getMIME( String extension) {
+        switch (extension.toLowerCase()) {
+            case CSS_EXTENSION: return CSS_MIME_TYPE;
+            case HTML_EXTENSION: return HTML_MIME_TYPE;
+            case JAVA_SCRIPT_EXTENSION: return JAVA_SCRIPT_MIME_TYPE;
+            case JSON_EXTENSION: return JSON_MIME_TYPE;
+            default: return DEFAULT_MIME_TYPE;
+        }
     }
 }
