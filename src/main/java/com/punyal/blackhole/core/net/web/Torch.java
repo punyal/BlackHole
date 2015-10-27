@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.control;
+package com.punyal.blackhole.core.net.web;
 
-import static com.punyal.blackhole.constants.ConstantsNet.*;
+import static com.punyal.blackhole.constants.ConstantsNet.COAP_RESOURCE_ROCKBOLT;
 import static com.punyal.blackhole.constants.ConstantsSystem.*;
-import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import com.punyal.blackhole.core.net.EndPoint;
 import java.net.Inet6Address;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -34,15 +34,15 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class Caster extends Thread {
-    private final LWM2Mdevice device;
-    private final String resource;
-    private final int alarmLevel;
+public class Torch extends Thread {
+    private final EndPoint endPoint;
+    private final boolean mode;
+    private CoapClient coapClient;
     
-    public Caster(LWM2Mdevice device, String resource, int alarmLevel) {
-        this.device = device;
-        this.resource = resource;
-        this.alarmLevel = alarmLevel;
+    public Torch(EndPoint endPoint, boolean mode) {
+        this.endPoint = endPoint;
+        this.mode = mode;
+        setDaemon(true);
     }
     
     public void startThread() {
@@ -53,29 +53,22 @@ public class Caster extends Thread {
     public void run() {
         try {
             String uri;
-            
-            if (device.getEndPoint().getInetAddress() instanceof Inet6Address)
-                uri = "coap://["+device.getEndPoint().getAddress()+"]:"+device.getEndPoint().getPort()+COAP_RESOURCE_ROCKBOLT;
+            if (endPoint.getInetAddress() instanceof Inet6Address)
+                uri = "coap://["+endPoint.getAddress()+"]:"+endPoint.getPort()+COAP_RESOURCE_ROCKBOLT;
             else
-                uri = "coap://"+device.getEndPoint().getAddress()+":"+device.getEndPoint().getPort()+COAP_RESOURCE_ROCKBOLT;
-            CoapClient coapClient = new CoapClient(uri);
-            //System.out.println(uri);
-            String alarmMessage="";
-            switch (alarmLevel) {
-                case 2:
-                    if (resource.equals(COAP_RESOURCE_RMS)) alarmMessage = ALARM_MESSAGE_RMS_LEVEL_2;
-                    break;
-                default:
-                    if (resource.equals(COAP_RESOURCE_RMS)) alarmMessage = ALARM_MESSAGE_RMS_LEVEL_1;
-                    break;
-            }
-            coapClient.post(alarmMessage, MediaTypeRegistry.TEXT_PLAIN);
-            //System.out.println("MESSAGE: "+alarmMessage);
-            //System.out.println(coapClient.toString());
+                uri = "coap://"+endPoint.getAddress()+":"+endPoint.getPort()+COAP_RESOURCE_ROCKBOLT;
+            coapClient = new CoapClient(uri);
+            //System.out.println(coapClient.getURI());
+            
+            String torchMessage;
+            if (mode) torchMessage = TORCH_MESSAGE_ON;
+            else torchMessage = TORCH_MESSAGE_OFF;
+            //System.out.println("MESSAGE: "+torchMessage);
+
+            coapClient.post(torchMessage, MediaTypeRegistry.TEXT_PLAIN);
             
         } finally {
-            //System.out.println("Killing Caster...");
+            //System.out.println("Killing Torch...");
         }
     }
-    
 }

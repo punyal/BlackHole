@@ -40,5 +40,7 @@ public class ConstantsSystem {
     // ALARMS
     public static final String ALARM_MESSAGE_RMS_LEVEL_1="LED:3,400,5";
     public static final String ALARM_MESSAGE_RMS_LEVEL_2="LED:3,100,30";
+    public static final String TORCH_MESSAGE_ON="TORCH:1";
+    public static final String TORCH_MESSAGE_OFF="TORCH:0";
     
 }

@@ -55,7 +55,7 @@ public class BlackHole implements Runnable {
     
     public void start() {
         System.out.println("BlackHole: Starting...");
-        //lwm2mServer.start();
+        lwm2mServer.start();
         run();
     }
 

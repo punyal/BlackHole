@@ -52,6 +52,7 @@ public class AlarmCollector {
         if (this.timestamp == 0) this.timestamp = timestamp;
         if (alarmLevel > this.alarmLevel) this.alarmLevel = alarmLevel;
         names.add(name);
+        
     }
     
     public long getTimestamp() {

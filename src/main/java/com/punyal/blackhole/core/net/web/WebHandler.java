@@ -23,18 +23,21 @@
  */
 package com.punyal.blackhole.core.net.web;
 
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import static com.punyal.blackhole.core.net.web.MIMEtype.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 /**
@@ -67,14 +70,19 @@ public class WebHandler extends AbstractHandler{
                 else fileNotFound(baseRequest, request, response);
             } else { // AJAX jQuery handlers...
                 // listOfRockBolts
-                listOfRockBolts(baseRequest, request, response);
+                if (webFile.getFileName().equals("listOfRockBolts"))
+                    listOfRockBolts(baseRequest, request, response);
+                else if (webFile.getFileName().equals("torch"))
+                    torch(baseRequest, request, response);
+                else
+                    fileNotFound(baseRequest, request, response);
                 
             }
         } else {
             fileResponse(webFile, baseRequest, request, response);
         }
-        
-        System.out.println(webFile.toString());
+        //System.out.println(target);
+        //System.out.println(webFile.toString());
     }
     
     public void fileResponse(WebFile webFile,
@@ -111,7 +119,7 @@ public class WebHandler extends AbstractHandler{
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         String line;
         StringBuilder data = new StringBuilder();
-        while ((line = reader.readLine()) != null) data.append(line);
+        while ((line = reader.readLine()) != null) data.append(line+"\n");
         response.setContentType(MIMEtype.getMIME(HTML_MIME_TYPE));
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
@@ -125,12 +133,44 @@ public class WebHandler extends AbstractHandler{
                        HttpServletResponse response) throws IOException, ServletException {
         JSONObject json = new JSONObject();
         json.put("time_date", (new Date(System.currentTimeMillis())).toString());
-        json.put("connected_devices", ""+devicesList.size());
+        
+        JSONArray list = new JSONArray();
+        for (LWM2Mdevice device: devicesList.getDevices()) {
+            if (device.isAlive()) {
+                JSONObject jtmp = new JSONObject();
+                jtmp.put("name", device.getName());
+                jtmp.put("address", device.getEndPoint().getAddress());
+                jtmp.put("alarms", device.getAlarmTotal());
+                jtmp.put("messages", device.getMessagesTotal());
+                list.add(jtmp);
+            }
+        }
+        json.put("devices", list);
         
         response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
         response.getWriter().println(json.toJSONString());
+    }
+    
+    public void torch(
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+        
+        //System.out.println("------------------");
+        String torchData = request.getParameter("torchdata");
+        String name = torchData.substring(0, torchData.lastIndexOf("("));
+        int mode = Integer.parseInt(torchData.substring(torchData.lastIndexOf("(")+1, torchData.lastIndexOf(")")));
+        
+        LWM2Mdevice device = devicesList.getDeviceByName(name);
+        device.torch((mode != 0));
+        
+        //System.out.println("------------------");
+        response.setContentType(MIMEtype.getMIME(HTML_MIME_TYPE));
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println("");
     }
     
 }

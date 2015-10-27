@@ -28,6 +28,7 @@ import com.punyal.blackhole.core.data.IncomingData;
 import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.net.EndPoint;
 import com.punyal.blackhole.core.net.rockbolt.RockboltClient;
+import com.punyal.blackhole.core.net.web.Torch;
 
 
 /**
@@ -42,6 +43,8 @@ public class LWM2Mdevice {
     private boolean connected;
     private RockboltClient rockboltClient;
     private IncomingDataBase incomingDB;
+    private int alarmTotal;
+    private int messagesTotal;
     
     public LWM2Mdevice(EndPoint endPoint, String name, String id) {
         this.endPoint = endPoint;
@@ -50,6 +53,8 @@ public class LWM2Mdevice {
         lastUpdate = System.currentTimeMillis();
         connected = false;
         incomingDB = null;
+        alarmTotal = 0;
+        messagesTotal = 0;
     }
     
     public EndPoint getEndPoint() {
@@ -71,6 +76,10 @@ public class LWM2Mdevice {
     public void updateID(String id) {
         this.id = id;
         setAlive(incomingDB);
+    }
+    
+    public boolean isAlive() {
+        return connected;
     }
     
     public void setAlive(IncomingDataBase incomingDB) {
@@ -98,6 +107,27 @@ public class LWM2Mdevice {
         if (incomingDB != null) {
             incomingDB.addData(new IncomingData(name, resource, response));
         }
+    }
+    
+    public void torch(boolean mode) {
+        Torch torchThread = new Torch(endPoint, mode);
+        torchThread.startThread();
+    }
+    
+    public void increaseAlarmTotal(){
+        alarmTotal++;
+    }
+    
+    public int getAlarmTotal() {
+        return alarmTotal;
+    }
+    
+    public void increaseMessagesTotal(){
+        messagesTotal++;
+    }
+    
+    public int getMessagesTotal() {
+        return messagesTotal;
     }
 
 }
