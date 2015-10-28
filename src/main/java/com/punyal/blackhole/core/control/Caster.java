@@ -59,6 +59,7 @@ public class Caster extends Thread {
             else
                 uri = "coap://"+device.getEndPoint().getAddress()+":"+device.getEndPoint().getPort()+COAP_RESOURCE_ROCKBOLT;
             CoapClient coapClient = new CoapClient(uri);
+            coapClient.useNONs();
             //System.out.println(uri);
             String alarmMessage="";
             switch (alarmLevel) {

@@ -58,6 +58,7 @@ public class Torch extends Thread {
             else
                 uri = "coap://"+endPoint.getAddress()+":"+endPoint.getPort()+COAP_RESOURCE_ROCKBOLT;
             coapClient = new CoapClient(uri);
+            coapClient.useNONs();
             //System.out.println(coapClient.getURI());
             
             String torchMessage;
