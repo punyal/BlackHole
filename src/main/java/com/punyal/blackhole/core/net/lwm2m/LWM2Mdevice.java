@@ -104,6 +104,7 @@ public class LWM2Mdevice {
     }
     
     public void incomingData(String resource, String response) {
+        if (isAlive()) lastUpdate = System.currentTimeMillis();
         if (incomingDB != null) {
             incomingDB.addData(new IncomingData(name, resource, response));
         }

@@ -42,12 +42,12 @@ public class RMSdataBase {
         return list.size();
     }
 
-    public void addData(RMSdata rmsData) {
+    synchronized public void addData(RMSdata rmsData) {
         if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
         list.add(rmsData);
     }
     
-    private void remove(RMSdata rmsData) {
+    synchronized private void remove(RMSdata rmsData) {
         list.remove(rmsData);
     }
     

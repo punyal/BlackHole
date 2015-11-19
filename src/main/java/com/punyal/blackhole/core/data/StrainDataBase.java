@@ -42,12 +42,12 @@ public class StrainDataBase {
         return list.size();
     }
 
-    public void addData(StrainData strainData) {
+    synchronized public void addData(StrainData strainData) {
         if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
         list.add(strainData);
     }
     
-    private void remove(StrainData strainData) {
+    synchronized private void remove(StrainData strainData) {
         list.remove(strainData);
     }
     

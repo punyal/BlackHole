@@ -99,7 +99,10 @@ public class WebHandler extends AbstractHandler{
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             StringBuilder data = new StringBuilder();
-            while ((line = reader.readLine()) != null) data.append(line);
+            while ((line = reader.readLine()) != null){
+                data.append(line);
+                data.append(System.getProperty("line.separator"));
+            }
             response.setContentType(MIMEtype.getMIME(webFile.getExtension()));
             response.setStatus(HttpServletResponse.SC_OK);
             baseRequest.setHandled(true);

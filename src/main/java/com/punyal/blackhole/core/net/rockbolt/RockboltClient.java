@@ -36,16 +36,15 @@ import org.eclipse.californium.core.CoapResponse;
 public class RockboltClient extends Thread {
     private final  LWM2Mdevice device;
     private boolean running;
-    //private final CoapObserver strainObserver;
+    private final CoapObserver strainObserver;
     private final CoapObserver rmsObserver;
-    //private final CoapObserver boltObserver;
     
     
     public RockboltClient(final LWM2Mdevice device) {
         this.device = device;
         this.setDaemon(true);
         running = true;
-        /*strainObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_STRAIN) {
+        strainObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_STRAIN) {
             
             @Override
             public void incomingData(CoapResponse response) {
@@ -55,9 +54,9 @@ public class RockboltClient extends Thread {
             
             @Override
             public void error() {
-                System.out.println("No data");
+                System.out.println("Error Strain resource on "+device.getName());
             }
-        };*/
+        };
         rmsObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_RMS) {
             
             @Override
@@ -68,37 +67,22 @@ public class RockboltClient extends Thread {
             
             @Override
             public void error() {
-                System.out.println("No data");
+                System.out.println("Error RMS resource on "+device.getName());
             }
         };
-        /*boltObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_BOLTFAILURE) {
-            
-            @Override
-            public void incomingData(CoapResponse response) {
-                if (!response.getResponseText().isEmpty())
-                    device.incomingData(COAP_RESOURCE_BOLTFAILURE, response.getResponseText());
-            }
-            
-            @Override
-            public void error() {
-                System.out.println("No data");
-            }
-        };*/
     }
     
     public void startThread() {
         start();
         //System.out.println("starting observe");
-        //strainObserver.startObserve();
+        strainObserver.startObserve();
         rmsObserver.startObserve();
-        //boltObserver.startObserve();
     }
     
     public void stopThread() {
         running = false;
-        //strainObserver.stopObserver();
+        strainObserver.stopObserver();
         rmsObserver.stopObserver();
-        //boltObserver.startObserve();
     }
     
     @Override

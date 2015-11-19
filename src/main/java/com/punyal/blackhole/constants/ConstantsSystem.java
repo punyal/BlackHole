@@ -38,8 +38,10 @@ public class ConstantsSystem {
     public static final int ALARM_GROUP_TIME = 1000; // 1s
     
     // ALARMS
-    public static final String ALARM_MESSAGE_RMS_LEVEL_1="LED:3,400,5";
-    public static final String ALARM_MESSAGE_RMS_LEVEL_2="LED:3,100,30";
+    public static final String ALARM_MESSAGE_RMS_LEVEL_1="ALARM:VIBRATION,LEVEL_1";
+    public static final String ALARM_MESSAGE_RMS_LEVEL_2="ALARM:VIBRATION,LEVEL_2";
+    public static final String ALARM_MESSAGE_STRAIN_LEVEL_1="ALARM:STRAIN,LEVEL_1";
+    public static final String ALARM_MESSAGE_STRAIN_LEVEL_2="ALARM:STRAIN,LEVEL_2";
     public static final String TORCH_MESSAGE_ON="TORCH:1";
     public static final String TORCH_MESSAGE_OFF="TORCH:0";
     

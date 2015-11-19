@@ -42,12 +42,12 @@ public class IncomingDataBase {
         return list.size();
     }
 
-    public void addData(IncomingData incomingData) {
+    synchronized public void addData(IncomingData incomingData) {
         if (list.size() >= DATA_BASE_MAX_SIZE) list.remove(0);
         list.add(incomingData);
     }
     
-    private void remove(IncomingData incomingData) {
+    synchronized private void remove(IncomingData incomingData) {
         list.remove(incomingData);
     }
     

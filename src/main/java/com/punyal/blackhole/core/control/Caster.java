@@ -59,15 +59,17 @@ public class Caster extends Thread {
             else
                 uri = "coap://"+device.getEndPoint().getAddress()+":"+device.getEndPoint().getPort()+COAP_RESOURCE_ROCKBOLT;
             CoapClient coapClient = new CoapClient(uri);
-            coapClient.useNONs();
+            coapClient.useCONs();
             //System.out.println(uri);
             String alarmMessage="";
             switch (alarmLevel) {
                 case 2:
                     if (resource.equals(COAP_RESOURCE_RMS)) alarmMessage = ALARM_MESSAGE_RMS_LEVEL_2;
+                    if (resource.equals(COAP_RESOURCE_STRAIN)) alarmMessage = ALARM_MESSAGE_STRAIN_LEVEL_2;
                     break;
                 default:
                     if (resource.equals(COAP_RESOURCE_RMS)) alarmMessage = ALARM_MESSAGE_RMS_LEVEL_1;
+                    if (resource.equals(COAP_RESOURCE_STRAIN)) alarmMessage = ALARM_MESSAGE_STRAIN_LEVEL_1;
                     break;
             }
             coapClient.post(alarmMessage, MediaTypeRegistry.TEXT_PLAIN);

@@ -32,10 +32,12 @@ import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
  */
 public class Alarmer extends Thread {
     private final AlarmCollector alarmRMS;
+    private final AlarmCollector alarmStrain;
     private final Multicaster multicaster;
     
     public Alarmer(LWM2Mlist devicesList) {
         alarmRMS = new AlarmCollector();
+        alarmStrain = new AlarmCollector();
         multicaster = new Multicaster(devicesList);
         setDaemon(true);
     }
@@ -47,6 +49,7 @@ public class Alarmer extends Thread {
     public void newAlarm(String resource, String name, int alarmLevel, long timestamp) {
         switch(resource) {
             case COAP_RESOURCE_STRAIN:
+                alarmStrain.add(name, alarmLevel, timestamp);
                 break;
             case COAP_RESOURCE_RMS:
                 alarmRMS.add(name, alarmLevel, timestamp);
@@ -68,6 +71,15 @@ public class Alarmer extends Thread {
                     System.out.print("]\n");
                     multicaster.newMulticaster(alarmRMS.getNames(), COAP_RESOURCE_RMS, alarmRMS.getAlarmLevel());
                     alarmRMS.clear();
+                }
+                
+                if (alarmStrain.isTimeout()) {
+                    System.out.print("RMS alarm level"+alarmStrain.getAlarmLevel()+" except to [");
+                    for (String name: alarmStrain.getNames())
+                        System.out.print(name+" ");
+                    System.out.print("]\n");
+                    multicaster.newMulticaster(alarmStrain.getNames(), COAP_RESOURCE_STRAIN, alarmStrain.getAlarmLevel());
+                    alarmStrain.clear();
                 }
                 
                 try {
