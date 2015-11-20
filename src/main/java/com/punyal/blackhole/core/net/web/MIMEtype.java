@@ -36,7 +36,13 @@ public class MIMEtype {
     public static final String JAVA_SCRIPT_MIME_TYPE = "application/javascript";
     public static final String JSON_EXTENSION = ".json";
     public static final String JSON_MIME_TYPE = "application/json";
+    public static final String TTF_EXTENSION = ".ttf";
+    public static final String TTF_MIME_TYPE = "application/x-font-ttf";
+    public static final String WOFF_EXTENSION = ".woff";
+    public static final String WOFF_MIME_TYPE = "application/x-font-woff";
     
+    
+            
     // Default
     public static final String DEFAULT_EXTENSION = HTML_EXTENSION;
     public static final String DEFAULT_MIME_TYPE = HTML_MIME_TYPE;
@@ -47,6 +53,8 @@ public class MIMEtype {
             case HTML_EXTENSION: return HTML_MIME_TYPE;
             case JAVA_SCRIPT_EXTENSION: return JAVA_SCRIPT_MIME_TYPE;
             case JSON_EXTENSION: return JSON_MIME_TYPE;
+            case TTF_EXTENSION: return TTF_MIME_TYPE;
+            case WOFF_EXTENSION: return WOFF_MIME_TYPE;
             default: return DEFAULT_MIME_TYPE;
         }
     }

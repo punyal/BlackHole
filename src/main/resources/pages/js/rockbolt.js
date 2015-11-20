@@ -48,7 +48,8 @@ function getListOfRockBolts() {
     mimeType: 'application/json',
 
     success: function (data) {
-      $('#timeDate').text(data.time_date);
+      $('#serverTime').text(data.time_date);
+      console.log(data.time_date);
       $('#rockBoltsConnected').text(data.devices.length);
       
       if (TotalConnected > data.devices.length) {

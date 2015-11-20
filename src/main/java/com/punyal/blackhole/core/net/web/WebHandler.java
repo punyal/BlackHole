@@ -30,7 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -65,22 +65,22 @@ public class WebHandler extends AbstractHandler{
             if (webFile.getFileName().isEmpty()) {
                 if (webFile.getFolder().equals("/")) { // Index
                     webFile.setTarget("/index.html");
-                    fileResponse(webFile, baseRequest, request, response);
+                    //fileResponse(webFile, baseRequest, request, response);
                 }
                 else fileNotFound(baseRequest, request, response);
             } else { // AJAX jQuery handlers...
                 // listOfRockBolts
-                if (webFile.getFileName().equals("listOfRockBolts"))
-                    listOfRockBolts(baseRequest, request, response);
-                else if (webFile.getFileName().equals("torch"))
-                    torch(baseRequest, request, response);
-                else
-                    fileNotFound(baseRequest, request, response);
+                switch (webFile.getFileName()) {
+                    case "listOfRockBolts":
+                        listOfRockBolts(baseRequest, request, response);
+                        break;
+                    case "torch":
+                        torch(baseRequest, request, response);
+                        break;
+                }
                 
             }
-        } else {
-            fileResponse(webFile, baseRequest, request, response);
-        }
+        } 
         //System.out.println(target);
         //System.out.println(webFile.toString());
     }
@@ -99,10 +99,11 @@ public class WebHandler extends AbstractHandler{
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line;
             StringBuilder data = new StringBuilder();
-            while ((line = reader.readLine()) != null){
-                data.append(line);
-                data.append(System.getProperty("line.separator"));
-            }
+            
+                while ((line = reader.readLine()) != null){
+                    data.append(line);
+                    data.append(System.getProperty("line.separator"));
+                }
             response.setContentType(MIMEtype.getMIME(webFile.getExtension()));
             response.setStatus(HttpServletResponse.SC_OK);
             baseRequest.setHandled(true);
@@ -135,7 +136,8 @@ public class WebHandler extends AbstractHandler{
                        HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
         JSONObject json = new JSONObject();
-        json.put("time_date", (new Date(System.currentTimeMillis())).toString());
+        SimpleDateFormat sdf = new SimpleDateFormat("Y-M-d H:m:s z");
+        json.put("time_date", sdf.format(new Date(System.currentTimeMillis())));
         
         JSONArray list = new JSONArray();
         for (LWM2Mdevice device: devicesList.getDevices()) {

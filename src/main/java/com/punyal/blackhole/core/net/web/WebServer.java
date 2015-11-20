@@ -24,25 +24,41 @@
 package com.punyal.blackhole.core.net.web;
 
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class WebServer {
-    private final Server server;
     
-    public WebServer(LWM2Mlist devicesList) {
-        server = new Server(3000);
-        server.setHandler(new WebHandler(devicesList));
+    public WebServer(LWM2Mlist devicesList) {        
+        Server server = new Server(3000);
+        ResourceHandler resource_handler = new ResourceHandler();
+        
+        String  baseStr  = "/pages";  //... contains: helloWorld.html, login.html, etc. and folder: other/xxx.html
+        URL     baseUrl  = WebServer.class.getResource( baseStr ); 
+        String  basePath = baseUrl.toExternalForm();
+        
+        
+        resource_handler.setResourceBase(basePath);
+        HandlerList handlers = new HandlerList();
+        handlers.setHandlers(new Handler[]{new WebHandler(devicesList),resource_handler,new DefaultHandler()});
+        server.setHandler(handlers);
+        System.out.println("Starting Server at: " + server.getURI());
         try {
             server.start();
-            //server.join();
+            server.join();
         } catch (Exception ex) {
-            System.out.println("WebError: "+ ex);
+            Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println(server.getURI());
     }
     
 }
