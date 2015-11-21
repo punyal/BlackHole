@@ -24,11 +24,17 @@
 package com.punyal.blackhole.core.net.lwm2m;
 
 import static com.punyal.blackhole.constants.ConstantsNet.LWM2M_TIMEOUT;
+import static com.punyal.blackhole.constants.ConstantsSystem.DATA_BASE_MAX_SIZE;
+import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.data.IncomingData;
 import com.punyal.blackhole.core.data.IncomingDataBase;
+import com.punyal.blackhole.core.data.RMSdata;
+import com.punyal.blackhole.core.data.StrainData;
 import com.punyal.blackhole.core.net.EndPoint;
 import com.punyal.blackhole.core.net.rockbolt.RockboltClient;
 import com.punyal.blackhole.core.net.web.Torch;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -36,6 +42,7 @@ import com.punyal.blackhole.core.net.web.Torch;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class LWM2Mdevice {
+    private final EventDataBase eventDB;
     private final EndPoint endPoint;
     private final String name;
     private String id;
@@ -51,7 +58,14 @@ public class LWM2Mdevice {
     private int alarmsVibration;
     private int alarmsStrain;
     
-    public LWM2Mdevice(EndPoint endPoint, String name, String id) {
+    // microDB
+    private final List<StrainData> strainData;
+    private final List<RMSdata> rmsData;
+    
+    
+    
+    public LWM2Mdevice(EventDataBase eventDB, EndPoint endPoint, String name, String id) {
+        this.eventDB = eventDB;
         this.endPoint = endPoint;
         this.name = name;
         this.id = id;
@@ -65,6 +79,9 @@ public class LWM2Mdevice {
         messagesOut = 0;
         alarmsVibration = 0;
         alarmsStrain = 0;
+        
+        strainData = new ArrayList<>();
+        rmsData = new ArrayList<>();
     }
     
     public EndPoint getEndPoint() {
@@ -95,6 +112,7 @@ public class LWM2Mdevice {
     public void setAlive(IncomingDataBase incomingDB) {
         if (!connected) {
             connected = true;
+            eventDB.addEvent(name+" [Online]");
             //run here a new thread!!
             if ( (System.currentTimeMillis()-lastUpdate)>LWM2M_TIMEOUT ) {
                 System.out.println(name+" [resurrected]");
@@ -109,6 +127,7 @@ public class LWM2Mdevice {
     }
     
     public void setDead() {
+        eventDB.addEvent(name+" [Offline]");
         connected = false;
         rockboltClient.stopThread();
     }
@@ -180,5 +199,24 @@ public class LWM2Mdevice {
     public void increaseAlarmsStrain() {
         alarmsStrain++;
     }
-
+    
+    synchronized public void addVibrationData(float x, float y, float z) {
+        if (!isAlive()) return;
+        if (rmsData.size() >= DATA_BASE_MAX_SIZE) rmsData.remove(0);
+        rmsData.add(new RMSdata(null, System.currentTimeMillis(), 0, x, y, z));
+    }
+    
+    synchronized public void addStrainData(int strain) {
+        if (!isAlive()) return;
+        if (strainData.size() >= DATA_BASE_MAX_SIZE) strainData.remove(0);
+        strainData.add(new StrainData(null, System.currentTimeMillis(), 0, strain));
+    }
+    
+    public List<RMSdata> getVibrationData() {
+        return rmsData;
+    }
+    
+    public List<StrainData> getStrainData() {
+        return strainData;
+    }
 }

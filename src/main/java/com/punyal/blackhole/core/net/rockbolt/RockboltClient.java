@@ -1,4 +1,4 @@
-/*
+ /*
  * The MIT License
  *
  * Copyright 2015 Pablo Puñal Pereira <pablo.punal@ltu.se>.
@@ -26,7 +26,9 @@ package com.punyal.blackhole.core.net.rockbolt;
 import static com.punyal.blackhole.constants.ConstantsNet.*;
 import com.punyal.blackhole.core.net.CoapObserver;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import com.punyal.blackhole.utils.Parsers;
 import org.eclipse.californium.core.CoapResponse;
+import org.json.simple.JSONObject;
 
 
 /**
@@ -49,8 +51,13 @@ public class RockboltClient extends Thread {
             
             @Override
             public void incomingData(CoapResponse response) {
-                if (!response.getResponseText().isEmpty())
+                device.increaseMessageIn();
+                if (!response.getResponseText().isEmpty()) {
                     device.incomingData(COAP_RESOURCE_STRAIN, response.getResponseText());
+                    JSONObject json = Parsers.senml2json(response.getResponseText());
+                    device.addStrainData(Integer.parseInt(json.get("strain").toString()));
+                }
+                    
             }
             
             @Override
@@ -62,8 +69,12 @@ public class RockboltClient extends Thread {
             
             @Override
             public void incomingData(CoapResponse response) {
-                if (!response.getResponseText().isEmpty())
+                device.increaseMessageIn();
+                if (!response.getResponseText().isEmpty()) {
                     device.incomingData(COAP_RESOURCE_RMS, response.getResponseText());
+                    JSONObject json = Parsers.senml2json(response.getResponseText());
+                    device.addVibrationData(Float.parseFloat(json.get("X").toString()), Float.parseFloat(json.get("Y").toString()), Float.parseFloat(json.get("Z").toString()));
+                }
             }
             
             @Override
@@ -76,8 +87,13 @@ public class RockboltClient extends Thread {
             
             @Override
             public void incomingData(CoapResponse response) {
+                device.increaseMessageIn();
                 if (!response.getResponseText().isEmpty()) {
-                    System.out.println(response.getResponseText());
+                    JSONObject json = Parsers.senml2json(response.getResponseText());
+                    if (json.get("Vbat") != null) {
+                        int battery = Integer.parseInt(json.get("Vbat").toString());
+                        device.setBatteryLevel(battery);
+                    }
                 }
             }
             

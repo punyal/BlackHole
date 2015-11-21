@@ -9,6 +9,74 @@ function getGraph(name) {
     window.alert("getGraph of "+name);
 }
 
+var timeLineModeAutomatic = 1;
+function autoUpdate(mode) {
+    $('#timeLineUpdateMode').empty();
+    if (mode) {
+        $('#timeLineUpdateMode').append('<a class="btn update-easy-pie-chart" onclick="autoUpdate(0);"><i class="icon-repeat"></i> Automatic</a>');
+    } else {
+        $('#timeLineUpdateMode').append('<a class="btn update-easy-pie-chart" onclick="autoUpdate(1);"><i class="icon-hand-up"></i> Manual</a>');
+    }
+    timeLineModeAutomatic = mode;
+    
+}
+
+var timeLineData = new vis.DataSet();
+var timeline;
+function bootTimeLine() {
+    
+    timeLineData.on('*', function (event, properties, senderId) {
+        console.log('event', event, properties);
+    });
+    
+    var container = document.getElementById('vis_timeline');
+    
+    // Configuration for the Timeline
+    var options = options = {
+        autoResize: true
+      };
+
+    // Create a Timeline
+    timeline = new vis.Timeline(container, timeLineData, options);
+    var actualTime = Date.now();
+    var prevTime = new Date();
+    
+    prevTime.setMinutes(prevTime.getMinutes() - 1);
+    
+    timeline.setWindow(prevTime, actualTime);
+  
+}
+
+var lastTime = 0;
+
+function getTimeLine() {
+    if (timeLineModeAutomatic) timeline.moveTo(Date.now());
+    
+    /*
+    timeLineData.add([
+      {content: 'eventX', start: Date.now()}
+    ]);*/
+    var jSonReq = {"lastTime": lastTime};
+    $.ajax({
+       url: "getTimeLine",
+       type: 'post',
+       dataType: 'json',
+       data: jSonReq,
+        success: function (data) {
+            lastTime = data.actualTime;
+            for (var i=0; i<data.events.length ;i++) {
+                timeLineData.add([{content: data.events[i].data, start: new Date(data.events[i].time)}]);
+            }
+        },
+        error: function (data, status, er) {
+          console.log("error: "+data+" status: "+status+" er:"+er);
+        }
+       
+    });
+    
+    
+}
+
 
 function torch(name, mode) {
     console.log("Torch for "+name+" mode "+mode);
@@ -187,5 +255,10 @@ $(document).ready(function() {
   
   setInterval(function() {
     getRockBoltsList();
+  }, 1000);
+  
+  bootTimeLine();
+  setInterval(function() {
+    getTimeLine();
   }, 1000);
 });

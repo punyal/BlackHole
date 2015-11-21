@@ -25,6 +25,8 @@ package com.punyal.blackhole.core.net.web;
 
 import static com.punyal.blackhole.constants.ConstantsNet.*;
 import static com.punyal.blackhole.constants.ConstantsSystem.BH_VERSION;
+import com.punyal.blackhole.core.data.EventData;
+import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import static com.punyal.blackhole.core.net.web.MIMEtype.*;
@@ -34,6 +36,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,9 +51,11 @@ import org.json.simple.JSONObject;
  */
 public class WebHandler extends AbstractHandler{
     private final LWM2Mlist devicesList;
+    private final EventDataBase eventDB;
     
-    public WebHandler(LWM2Mlist devicesList) {
+    public WebHandler(LWM2Mlist devicesList, EventDataBase eventDB) {
         this.devicesList = devicesList;
+        this.eventDB = eventDB;
     }
     
     @Override
@@ -78,6 +83,9 @@ public class WebHandler extends AbstractHandler{
                         break;
                     case "getRockBoltsList":
                         getRockBoltsList(baseRequest, request, response);
+                        break;
+                    case "getTimeLine":
+                        getTimeLine(baseRequest, request, response);
                         break;
                     case "torch":
                         torch(baseRequest, request, response);
@@ -201,7 +209,7 @@ public class WebHandler extends AbstractHandler{
             tmp = new JSONObject();
             tmp.put(RB_NAME, device.getName());
             tmp.put(RB_ADDRESS, device.getEndPoint().getAddress());
-            tmp.put(RB_BATTERY, device.getBatteryLevel());
+            tmp.put(RB_BATTERY, device.getBatteryLevel()+"mV");
             tmp.put(RB_IN, device.getMessageIn());
             tmp.put(RB_OUT, device.getMessageOut());
             tmp.put(RB_VIBRATION, device.getAlarmsVibration());
@@ -212,6 +220,54 @@ public class WebHandler extends AbstractHandler{
         }
         
         json.put("devices", list);
+        
+        response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println(json.toJSONString());
+    }
+    
+    
+    public void getTimeLine(
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+        /**
+         *  Outgoing data expected:
+         *  {
+         *      "devices": [
+         *          {
+         *              "name": "\"RockBolt-240\"",
+         *              "address": "fdfd:0:0:0:5c0c:7122:c2df:4a58",
+         *              "battery": "12%",
+         *              "in_com": 123,
+         *              "out_com": 23,
+         *              "vibration": 34,
+         *              "strain": 21
+         *          }
+         *      ]
+         *  }
+         */
+        
+                
+        long lastTime = Long.parseLong(request.getParameter("lastTime"));
+        
+        JSONObject json = new JSONObject();
+        
+        List<EventData> toSend = eventDB.getEventsFrom(lastTime);
+        
+        JSONArray list = new JSONArray();
+        JSONObject tmp;
+        for (EventData event : toSend) {
+            tmp = new JSONObject();
+            tmp.put("time", event.timestamp);
+            tmp.put("data", event.data);
+            list.add(tmp);
+        }
+        json.put("events", list);
+        json.put("lastTime", lastTime);
+        json.put("actualTime", System.currentTimeMillis());
+        
         
         response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
         response.setStatus(HttpServletResponse.SC_OK);

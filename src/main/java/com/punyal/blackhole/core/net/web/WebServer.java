@@ -23,6 +23,7 @@
  */
 package com.punyal.blackhole.core.net.web;
 
+import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import java.net.URL;
 import java.util.logging.Level;
@@ -39,7 +40,7 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
  */
 public class WebServer {
     
-    public WebServer(LWM2Mlist devicesList) {        
+    public WebServer(LWM2Mlist devicesList, EventDataBase eventDB) {        
         Server server = new Server(3000);
         ResourceHandler resource_handler = new ResourceHandler();
         
@@ -50,7 +51,7 @@ public class WebServer {
         
         resource_handler.setResourceBase(basePath);
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{new WebHandler(devicesList),resource_handler,new DefaultHandler()});
+        handlers.setHandlers(new Handler[]{new WebHandler(devicesList, eventDB),resource_handler,new DefaultHandler()});
         server.setHandler(handlers);
         System.out.println("Starting Server at: " + server.getURI());
         try {

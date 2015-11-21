@@ -25,6 +25,7 @@ package com.punyal.blackhole;
 
 import static com.punyal.blackhole.constants.ConstantsNet.*;
 import com.punyal.blackhole.core.control.Analyzer;
+import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.data.RMSdataBase;
 import com.punyal.blackhole.core.data.StrainDataBase;
@@ -36,6 +37,7 @@ import com.punyal.blackhole.core.net.web.WebServer;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class BlackHole implements Runnable {
+    private final EventDataBase eventDB;
     private final IncomingDataBase incomingDB;
     private final StrainDataBase strainDB;
     private final RMSdataBase rmsDB;
@@ -44,17 +46,19 @@ public class BlackHole implements Runnable {
     private final WebServer webServer;
     
     public BlackHole() {
+        eventDB = new EventDataBase();
         incomingDB = new IncomingDataBase();
         strainDB = new StrainDataBase();
         rmsDB = new RMSdataBase();
-        lwm2mServer = new LWM2Mserver(incomingDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
-        analyzer = new Analyzer(incomingDB, strainDB, rmsDB, lwm2mServer.getDevices());
+        lwm2mServer = new LWM2Mserver(incomingDB, eventDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
+        analyzer = new Analyzer(eventDB, incomingDB, strainDB, rmsDB, lwm2mServer.getDevices());
         analyzer.startThread();
-        webServer = new WebServer(lwm2mServer.getDevices());
+        webServer = new WebServer(lwm2mServer.getDevices(), eventDB);
     }
     
     public void start() {
         System.out.println("BlackHole: Starting...");
+        eventDB.addEvent("BackHole: ON");
         lwm2mServer.start();
         run();
     }

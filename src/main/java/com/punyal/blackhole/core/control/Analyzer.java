@@ -24,6 +24,7 @@
 package com.punyal.blackhole.core.control;
 
 import static com.punyal.blackhole.constants.ConstantsNet.*;
+import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.data.IncomingData;
 import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.data.RMSdata;
@@ -45,12 +46,12 @@ public class Analyzer extends Thread {
     private final Alarmer alarmer;
     private final LWM2Mlist devicesList;
     
-    public Analyzer(IncomingDataBase incomingDB, StrainDataBase strainDB, RMSdataBase rmsDB, LWM2Mlist devicesList) {
+    public Analyzer(EventDataBase eventDB, IncomingDataBase incomingDB, StrainDataBase strainDB, RMSdataBase rmsDB, LWM2Mlist devicesList) {
         this.incomingDB = incomingDB;
         this.strainDB = strainDB;
         this.rmsDB = rmsDB;
         this.devicesList = devicesList;
-        alarmer = new Alarmer(devicesList);
+        alarmer = new Alarmer(devicesList, eventDB);
         alarmer.startThread();
         this.setDaemon(true);
     }
@@ -71,7 +72,6 @@ public class Analyzer extends Thread {
                 while ((incomingData = incomingDB.getFirst()) != null) {
                     resource = incomingData.resource;
                     //System.out.println(incomingData.name+"]resource:"+resource+" Data:"+incomingData.response);
-                    devicesList.getDeviceByName(incomingData.name).increaseMessageIn();
                     if (incomingData.response != null) {
                         switch (resource) {
                             case COAP_RESOURCE_STRAIN:

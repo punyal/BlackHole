@@ -21,43 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.net.lwm2m;
-
-import com.punyal.blackhole.core.data.EventDataBase;
-import com.punyal.blackhole.core.data.IncomingDataBase;
-import com.punyal.blackhole.core.net.EndPoint;
-import java.net.InetAddress;
+package com.punyal.blackhole.core.data;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class LWM2Mserver {
-    private final EndPoint endPoint;
-    private final LWM2Mlist devicesList;
+public class EventData {
+    public final long timestamp;
+    public final String data;
     
-    public LWM2Mserver(IncomingDataBase incomingDB, EventDataBase eventDB, InetAddress address, int port) {
-        endPoint = new EndPoint(address, port);
-        devicesList = new LWM2Mlist(incomingDB, eventDB);
+    public EventData(long timestamp, String data) {
+        this.timestamp = timestamp;
+        this.data = data;
     }
-    
-    public LWM2Mserver(IncomingDataBase incomingDB, EventDataBase eventDB, String host, int port) {
-        endPoint = new EndPoint(host, port);
-        devicesList = new LWM2Mlist(incomingDB, eventDB);
-    }
-    
-    public void start() {
-        System.out.println("LWM2Mserver: Starting...");
-        startSniffer();
-    }
-    
-    private void startSniffer() {
-        LWM2Msniffer lwm2mSnifer = new LWM2Msniffer(endPoint, devicesList);
-        lwm2mSnifer.start();
-    }
-    
-    public LWM2Mlist getDevices() {
-        return devicesList;
-    }
-    
 }
