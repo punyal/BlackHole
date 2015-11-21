@@ -77,34 +77,42 @@ public class Analyzer extends Thread {
                             case COAP_RESOURCE_STRAIN:
                                 //System.out.println(incomingData.response);
                                 // Parse data
-                                json = Parsers.senml2json(incomingData.response);
-                                name = incomingData.name;
-                                timestamp = incomingData.timestamp;
-                                alarm = Integer.parseInt(json.get("alarm").toString());
-                                if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsStrain();
-                                strainDB.addData(new StrainData(
-                                        name,
-                                        timestamp,
-                                        alarm,
-                                        Integer.parseInt(json.get("strain").toString())
-                                ));
+                                try {
+                                    json = Parsers.senml2json(incomingData.response);
+                                    name = incomingData.name;
+                                    timestamp = incomingData.timestamp;
+                                    alarm = Integer.parseInt(json.get("alarm").toString());
+                                    if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsStrain();
+                                    strainDB.addData(new StrainData(
+                                            name,
+                                            timestamp,
+                                            alarm,
+                                            Integer.parseInt(json.get("strain").toString())
+                                    ));
+                                } catch (NullPointerException ex) {
+                                    System.out.println("NullPointerException: "+incomingData.response);
+                                }
                                 break;
                             case COAP_RESOURCE_RMS:
                                 //System.out.println(incomingData.response);
                                 // Parse data
-                                json = Parsers.senml2json(incomingData.response);
-                                name = incomingData.name;
-                                timestamp = incomingData.timestamp;
-                                alarm = Integer.parseInt(json.get("a").toString());
-                                if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsVibration();
-                                rmsDB.addData(new RMSdata(
-                                        name,
-                                        timestamp,
-                                        alarm,
-                                        Float.parseFloat(json.get("X").toString()),
-                                        Float.parseFloat(json.get("Y").toString()),
-                                        Float.parseFloat(json.get("Z").toString())
-                                ));
+                                try {
+                                    json = Parsers.senml2json(incomingData.response);
+                                    name = incomingData.name;
+                                    timestamp = incomingData.timestamp;
+                                    alarm = Integer.parseInt(json.get("a").toString());
+                                    if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsVibration();
+                                    rmsDB.addData(new RMSdata(
+                                            name,
+                                            timestamp,
+                                            alarm,
+                                            Float.parseFloat(json.get("X").toString()),
+                                            Float.parseFloat(json.get("Y").toString()),
+                                            Float.parseFloat(json.get("Z").toString())
+                                    ));
+                                } catch (NullPointerException ex) {
+                                    System.out.println("NullPointerException: "+incomingData.response);
+                                }
                                 break;
                             default:
                                 //System.out.println("Unknown data");

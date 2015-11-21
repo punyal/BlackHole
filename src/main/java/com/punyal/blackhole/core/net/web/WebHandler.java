@@ -27,6 +27,8 @@ import static com.punyal.blackhole.constants.ConstantsNet.*;
 import static com.punyal.blackhole.constants.ConstantsSystem.BH_VERSION;
 import com.punyal.blackhole.core.data.EventData;
 import com.punyal.blackhole.core.data.EventDataBase;
+import com.punyal.blackhole.core.data.RMSdata;
+import com.punyal.blackhole.core.data.StrainData;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import static com.punyal.blackhole.core.net.web.MIMEtype.*;
@@ -86,6 +88,9 @@ public class WebHandler extends AbstractHandler{
                         break;
                     case "getTimeLine":
                         getTimeLine(baseRequest, request, response);
+                        break;
+                    case "getVibrationStrainData":
+                        getVibrationStrainData(baseRequest, request, response);
                         break;
                     case "torch":
                         torch(baseRequest, request, response);
@@ -269,6 +274,50 @@ public class WebHandler extends AbstractHandler{
         json.put("actualTime", System.currentTimeMillis());
         
         
+        response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println(json.toJSONString());
+    }
+    
+    public void getVibrationStrainData(
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+                
+        String deviceName = request.getParameter("device");
+        LWM2Mdevice device = devicesList.getDeviceByName(deviceName);
+        JSONObject json = new JSONObject();
+        
+        if (device != null) {
+            JSONArray list = new JSONArray();
+            JSONObject tmp;
+            for (RMSdata data : device.getVibrationData()) {
+                tmp = new JSONObject();
+                tmp.put("time", data.timestamp);
+                tmp.put("X", Math.sqrt(data.X));
+                tmp.put("Y", Math.sqrt(data.Y));
+                tmp.put("Z", Math.sqrt(data.Z));
+                list.add(tmp);
+                
+                System.out.println(data.X+ " "+ Math.sqrt(data.X));
+            }
+            json.put("vibration", list);
+            list = new JSONArray();
+            for (StrainData data : device.getStrainData()) {
+                tmp = new JSONObject();
+                tmp.put("time", data.timestamp);
+                tmp.put("strain", data.strain);
+                list.add(tmp);
+            }
+            json.put("strain", list);
+            
+        }
+        
+        json.put("test", 123);
+        
+        
+        //System.out.println(json.toJSONString());
         response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);

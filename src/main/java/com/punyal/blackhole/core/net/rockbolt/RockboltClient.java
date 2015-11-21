@@ -53,9 +53,11 @@ public class RockboltClient extends Thread {
             public void incomingData(CoapResponse response) {
                 device.increaseMessageIn();
                 if (!response.getResponseText().isEmpty()) {
-                    device.incomingData(COAP_RESOURCE_STRAIN, response.getResponseText());
-                    JSONObject json = Parsers.senml2json(response.getResponseText());
-                    device.addStrainData(Integer.parseInt(json.get("strain").toString()));
+                    try {
+                        device.incomingData(COAP_RESOURCE_STRAIN, response.getResponseText());
+                        JSONObject json = Parsers.senml2json(response.getResponseText());
+                        device.addStrainData(Integer.parseInt(json.get("strain").toString()));
+                    } catch(NullPointerException ex) {}
                 }
                     
             }
@@ -71,9 +73,11 @@ public class RockboltClient extends Thread {
             public void incomingData(CoapResponse response) {
                 device.increaseMessageIn();
                 if (!response.getResponseText().isEmpty()) {
-                    device.incomingData(COAP_RESOURCE_RMS, response.getResponseText());
-                    JSONObject json = Parsers.senml2json(response.getResponseText());
-                    device.addVibrationData(Float.parseFloat(json.get("X").toString()), Float.parseFloat(json.get("Y").toString()), Float.parseFloat(json.get("Z").toString()));
+                    try {
+                        device.incomingData(COAP_RESOURCE_RMS, response.getResponseText());
+                        JSONObject json = Parsers.senml2json(response.getResponseText());
+                        device.addVibrationData(Float.parseFloat(json.get("X").toString()), Float.parseFloat(json.get("Y").toString()), Float.parseFloat(json.get("Z").toString()));
+                    } catch(NullPointerException ex) {}
                 }
             }
             

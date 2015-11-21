@@ -4,9 +4,17 @@
  *  @author: Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 
+var graphClient = null;
+var vibrationData = new vis.DataSet();
+var vibrationChart;
+var strainData = new vis.DataSet();
+var strainChart;
 
 function getGraph(name) {
-    window.alert("getGraph of "+name);
+    graphClient = name;
+    vibrationData.remove(vibrationData.getIds());
+    strainData.remove(strainData.getIds());
+
 }
 
 var timeLineModeAutomatic = 1;
@@ -21,18 +29,98 @@ function autoUpdate(mode) {
     
 }
 
+
+function bootVibrationStrainChart() {
+    var vibrationContainer = document.getElementById('vis_vibration');
+    var strainContainer = document.getElementById('vis_strain');
+    var vibrationOptions = {
+        legend: true,
+        dataAxis: {
+            left: {
+                range: {min:0, max:10}
+            }
+        }
+    };
+    var groups = new vis.DataSet();
+    groups.add({
+    id: 0,
+    content: 'X',
+    options: {
+    }});
+    groups.add({
+    id: 1,
+    content: 'Y',
+    options: {
+    }});
+    groups.add({
+    id: 2,
+    content: 'Z',
+    options: {
+    }});
+    
+    
+    vibrationChart = new vis.Graph2d(vibrationContainer, vibrationData, groups, vibrationOptions);
+    var strainOptions = {
+        dataAxis: {
+            left: {
+                range: {min:0, max:1000}
+            }
+        }
+    };
+    strainChart = new vis.Graph2d(strainContainer, strainData, strainOptions);
+    var actualTime = Date.now();
+    var prevTime = new Date();
+    prevTime.setMinutes(prevTime.getMinutes() - 4);
+    vibrationChart.setWindow(prevTime, actualTime);
+    strainChart.setWindow(prevTime, actualTime);
+}
+
+function getVibrationStrainData() {
+    vibrationChart.moveTo(Date.now());
+    strainChart.moveTo(Date.now());
+    if (graphClient) {
+    var jSonReq = {"device": graphClient};
+    $.ajax({
+       url: "getVibrationStrainData",
+       type: 'post',
+       dataType: 'json',
+       data: jSonReq,
+        success: function (data) {
+            
+            for (var i=0; i<data.vibration.length ;i++) {
+                vibrationData.add([{x: new Date(data.vibration[i].time) , y: data.vibration[i].X, group: 0}]);
+                vibrationData.add([{x: new Date(data.vibration[i].time) , y: data.vibration[i].Y, group: 1}]);
+                vibrationData.add([{x: new Date(data.vibration[i].time) , y: data.vibration[i].Z, group: 2}]);
+            }
+            
+            for (var i=0; i<data.strain.length ;i++) {
+                strainData.add([{x: new Date(data.strain[i].time) , y: data.strain[i].strain}]);
+            }
+        },
+        error: function (data, status, er) {
+          console.log("error: "+data+" status: "+status+" er:"+er);
+        }
+       
+    });
+    } else {
+        //console.log("No valid client for Charts");
+    }
+}
+
+
+
 var timeLineData = new vis.DataSet();
 var timeline;
 function bootTimeLine() {
     
-    timeLineData.on('*', function (event, properties, senderId) {
-        console.log('event', event, properties);
-    });
+    //timeLineData.on('*', function (event, properties, senderId) {
+    //    console.log('event', event, properties);
+    //});
     
     var container = document.getElementById('vis_timeline');
     
     // Configuration for the Timeline
-    var options = options = {
+    var options = {
         autoResize: true
       };
 
@@ -260,5 +348,11 @@ $(document).ready(function() {
   bootTimeLine();
   setInterval(function() {
     getTimeLine();
+  }, 1000);
+  
+  
+  bootVibrationStrainChart();
+  setInterval(function() {
+    getVibrationStrainData();
   }, 1000);
 });
