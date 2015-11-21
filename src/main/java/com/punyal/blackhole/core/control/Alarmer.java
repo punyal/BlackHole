@@ -65,19 +65,19 @@ public class Alarmer extends Thread {
             while (true) {
                 
                 if (alarmRMS.isTimeout()) {
-                    System.out.print("RMS alarm level"+alarmRMS.getAlarmLevel()+" except to [");
-                    for (String name: alarmRMS.getNames())
-                        System.out.print(name+" ");
-                    System.out.print("]\n");
+                    //System.out.print("RMS alarm level"+alarmRMS.getAlarmLevel()+" except to [");
+                    //for (String name: alarmRMS.getNames())
+                    //    System.out.print(name+" ");
+                    //System.out.print("]\n");
                     multicaster.newMulticaster(alarmRMS.getNames(), COAP_RESOURCE_RMS, alarmRMS.getAlarmLevel());
                     alarmRMS.clear();
                 }
                 
                 if (alarmStrain.isTimeout()) {
-                    System.out.print("RMS alarm level"+alarmStrain.getAlarmLevel()+" except to [");
-                    for (String name: alarmStrain.getNames())
-                        System.out.print(name+" ");
-                    System.out.print("]\n");
+                    //System.out.print("RMS alarm level"+alarmStrain.getAlarmLevel()+" except to [");
+                    //for (String name: alarmStrain.getNames())
+                    //    System.out.print(name+" ");
+                    //System.out.print("]\n");
                     multicaster.newMulticaster(alarmStrain.getNames(), COAP_RESOURCE_STRAIN, alarmStrain.getAlarmLevel());
                     alarmStrain.clear();
                 }

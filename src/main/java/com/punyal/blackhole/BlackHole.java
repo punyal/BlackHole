@@ -63,6 +63,7 @@ public class BlackHole implements Runnable {
     public void run() {
         try {
             while (true) {
+                //System.out.println("Devices: "+lwm2mServer.getDevices().size());
                 //System.out.println("IncomingDB:"+incomingDB.size()+" StrainDB:"+strainDB.size()+" rmsDB:"+rmsDB.size());
                 //rmsDB.printAll();
                 try {

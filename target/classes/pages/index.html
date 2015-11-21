@@ -50,35 +50,35 @@
                     <div class="metro-nav-block nav-block-orange">
                         <a data-original-title="" href="#">
                             <i class="icon-hdd"></i>
-                            <div class="info">loading...</div>
+                            <div class="info" id="devicesConnected">loading...</div>
                             <div class="status">Devices Connected</div>
                         </a>
                     </div>
                     <div class="metro-nav-block nav-block-red">
                         <a data-original-title="" href="#">
                             <i class="icon-warning-sign"></i>
-                            <div class="info">loading...</div>
+                            <div class="info" id="totalAlarms">loading...</div>
                             <div class="status">Total Alarms</div>
                         </a>
                     </div>
                     <div class="metro-nav-block nav-block-grey">
                         <a data-original-title="" href="#">
                             <i class="icon-comments-alt"></i>
-                            <div class="info">loading...</div>
+                            <div class="info" id="totalMessages">loading...</div>
                             <div class="status">Total Messages</div>
                         </a>
                     </div>
                     <div class="metro-nav-block nav-block-blue double">
                         <a data-original-title="" href="#">
                             <i class="icon-calendar"></i>
-                            <div class="info" id="serverTime">loading...</div>
+                            <div class="info" id="dateTime">loading...</div>
                             <div class="status">Server's DateTime</div>
                         </a>
                     </div>
                     <div class="metro-nav-block nav-block-yellow">
                         <a data-original-title="" href="#">
                             <i class="icon-tags"></i>
-                            <div class="info">loading...</div>
+                            <div class="info" id="version">loading...</div>
                             <div class="status">Version</div>
                         </a>
                     </div>
@@ -129,41 +129,11 @@
                       <th><i class="icon-warning-sign"></i> Strain</th>
                       <th><i class="icon-fire"></i> Torch</th>
                       <th><i class="icon-pencil"></i> Graph</th>
+                      <th><i class="icon-off"></i> Status</th>
+                      <th><i class="icon-time"></i> Last Connection</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr>
-                      <td>RockBolt-240</td>
-                      <td>fdfd:0:0:0:5c0c:7122:c2df:4a58</td>
-                      <td>12%</td>
-                      <td>165</td>
-                      <td>34</td>
-                      <td>2</td>
-                      <td>3</td>
-                      <td>
-                        <button class="btn btn-success"><i class="icon-eye-open"></i> ON</button>
-                        <button class="btn btn-danger"><i class="icon-eye-close"></i> OFF</button>
-                      </td>
-                      <td>
-                        <button class="btn btn-primary"><i class="icon-ok"></i> Select</button>
-                      </td>
-                    </tr>
-                      <tr>
-                        <td>RockBolt-240</td>
-                        <td>fdfd:0:0:0:5c0c:7122:c2df:4a58</td>
-                        <td>12%</td>
-                        <td>165</td>
-                        <td>34</td>
-                        <td>2</td>
-                        <td>3</td>
-                        <td>
-                          <button class="btn btn-success"><i class="icon-eye-open"></i> ON</button>
-                          <button class="btn btn-danger"><i class="icon-eye-close"></i> OFF</button>
-                        </td>
-                        <td>
-                          <button class="btn btn-primary"><i class="icon-ok"></i> Select</button>
-                        </td>
-                      </tr>
+                  <tbody id="RockBoltsList">
                     </tbody>
                   </table>
                 </div>

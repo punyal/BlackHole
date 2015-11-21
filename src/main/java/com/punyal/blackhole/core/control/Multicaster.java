@@ -54,10 +54,9 @@ public class Multicaster {
         }
         
         for (LWM2Mdevice device: toSendList) {
-            System.out.println(device.getName());
+            //System.out.println(device.getName());
             caster = new Caster(device, resource, alarmLevel);
             caster.startThread();
         }
-        
     }
 }

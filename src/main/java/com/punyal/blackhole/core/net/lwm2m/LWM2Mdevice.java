@@ -43,8 +43,13 @@ public class LWM2Mdevice {
     private boolean connected;
     private RockboltClient rockboltClient;
     private IncomingDataBase incomingDB;
-    private int alarmTotal;
-    private int messagesTotal;
+    // int alarmTotal;
+    //private int messagesTotal;
+    private int battery;
+    private int messagesIn;
+    private int messagesOut;
+    private int alarmsVibration;
+    private int alarmsStrain;
     
     public LWM2Mdevice(EndPoint endPoint, String name, String id) {
         this.endPoint = endPoint;
@@ -53,8 +58,13 @@ public class LWM2Mdevice {
         lastUpdate = System.currentTimeMillis();
         connected = false;
         incomingDB = null;
-        alarmTotal = 0;
-        messagesTotal = 0;
+        //alarmTotal = 0;
+        //messagesTotal = 0;
+        battery = 0;
+        messagesIn = 0;
+        messagesOut = 0;
+        alarmsVibration = 0;
+        alarmsStrain = 0;
     }
     
     public EndPoint getEndPoint() {
@@ -111,11 +121,11 @@ public class LWM2Mdevice {
     }
     
     public void torch(boolean mode) {
-        Torch torchThread = new Torch(endPoint, mode);
+        Torch torchThread = new Torch(this, mode);
         torchThread.startThread();
     }
     
-    public void increaseAlarmTotal(){
+    /*public void increaseAlarmTotal(){
         alarmTotal++;
     }
     
@@ -129,6 +139,46 @@ public class LWM2Mdevice {
     
     public int getMessagesTotal() {
         return messagesTotal;
+    }
+    */
+    
+    public int getBatteryLevel() {
+        return battery;
+    }
+    
+    public void setBatteryLevel(int battery) {
+        this.battery = battery;
+    }
+    
+    public int getMessageIn() {
+        return messagesIn;
+    }
+    
+    public void increaseMessageIn() {
+        messagesIn++;
+    }
+    public int getMessageOut() {
+        return messagesOut;
+    }
+    
+    public void increaseMessageOut() {
+        messagesOut++;
+    }
+    
+    public int getAlarmsVibration() {
+        return alarmsVibration;
+    }
+    
+    public void increaseAlarmsVibration() {
+        alarmsVibration++;
+    }
+    
+    public int getAlarmsStrain() {
+        return alarmsStrain;
+    }
+    
+    public void increaseAlarmsStrain() {
+        alarmsStrain++;
     }
 
 }

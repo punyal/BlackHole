@@ -23,6 +23,8 @@
  */
 package com.punyal.blackhole.core.net.web;
 
+import static com.punyal.blackhole.constants.ConstantsNet.*;
+import static com.punyal.blackhole.constants.ConstantsSystem.BH_VERSION;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
 import static com.punyal.blackhole.core.net.web.MIMEtype.*;
@@ -71,8 +73,11 @@ public class WebHandler extends AbstractHandler{
             } else { // AJAX jQuery handlers...
                 // listOfRockBolts
                 switch (webFile.getFileName()) {
-                    case "listOfRockBolts":
-                        listOfRockBolts(baseRequest, request, response);
+                    case "getServerInfo":
+                        getServerInfo(baseRequest, request, response);
+                        break;
+                    case "getRockBoltsList":
+                        getRockBoltsList(baseRequest, request, response);
                         break;
                     case "torch":
                         torch(baseRequest, request, response);
@@ -131,25 +136,81 @@ public class WebHandler extends AbstractHandler{
     }
     
     
-    public void listOfRockBolts(
+    public void getServerInfo(
                        Request baseRequest,
                        HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
+        /**
+         * Outgoing data expected:
+         *  {
+         *      "version": 0.2,
+         *      "dateTime": "Y-M-d h:m:s z",
+         *      "devicesConnected": 4,
+         *      "totalAlarms": 1,
+         *      "totalMessages": 123,
+         *      "criticalAlertMessage": "RockBolt-204 broken!!"
+         *  } 
+         */
         JSONObject json = new JSONObject();
-        SimpleDateFormat sdf = new SimpleDateFormat("Y-M-d H:m:s z");
-        json.put("time_date", sdf.format(new Date(System.currentTimeMillis())));
+        SimpleDateFormat sdf = new SimpleDateFormat("Y-M-d HH:mm:ss z");
         
+        json.put("version", BH_VERSION);
+        json.put("dateTime", sdf.format(new Date(System.currentTimeMillis())));
+        json.put("devicesConnected", devicesList.getNumberOnlineDevices());
+        json.put("totalAlarms", devicesList.getTotalAlarms());
+        json.put("totalMessages", devicesList.getTotalMessages());
+        json.put("criticalAlertMessage", "");
+        
+        
+        response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
+        response.setStatus(HttpServletResponse.SC_OK);
+        baseRequest.setHandled(true);
+        response.getWriter().println(json.toJSONString());
+    }
+    
+    
+    public void getRockBoltsList(
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
+        /**
+         *  Outgoing data expected:
+         *  {
+         *      "devices": [
+         *          {
+         *              "name": "\"RockBolt-240\"",
+         *              "address": "fdfd:0:0:0:5c0c:7122:c2df:4a58",
+         *              "battery": "12%",
+         *              "in_com": 123,
+         *              "out_com": 23,
+         *              "vibration": 34,
+         *              "strain": 21
+         *          }
+         *      ]
+         *  }
+         */
+        
+        JSONObject json = new JSONObject();
         JSONArray list = new JSONArray();
+        JSONObject tmp;
+        SimpleDateFormat sdf = new SimpleDateFormat("Y-M-d HH:mm:ss z");
+        
+        //System.out.println("Connected devices: "+devicesList.getDevices().size());
+        
         for (LWM2Mdevice device: devicesList.getDevices()) {
-            if (device.isAlive()) {
-                JSONObject jtmp = new JSONObject();
-                jtmp.put("name", device.getName());
-                jtmp.put("address", device.getEndPoint().getAddress());
-                jtmp.put("alarms", device.getAlarmTotal());
-                jtmp.put("messages", device.getMessagesTotal());
-                list.add(jtmp);
-            }
+            tmp = new JSONObject();
+            tmp.put(RB_NAME, device.getName());
+            tmp.put(RB_ADDRESS, device.getEndPoint().getAddress());
+            tmp.put(RB_BATTERY, device.getBatteryLevel());
+            tmp.put(RB_IN, device.getMessageIn());
+            tmp.put(RB_OUT, device.getMessageOut());
+            tmp.put(RB_VIBRATION, device.getAlarmsVibration());
+            tmp.put(RB_STRAIN, device.getAlarmsStrain());
+            tmp.put(RB_STATUS, (device.isAlive())?"Online":"Offline");
+            tmp.put(RB_LAST_CONNECTION, sdf.format(new Date(device.getLastUpdate())));
+            list.add(tmp);
         }
+        
         json.put("devices", list);
         
         response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
@@ -169,7 +230,7 @@ public class WebHandler extends AbstractHandler{
         int mode = Integer.parseInt(torchData.substring(torchData.lastIndexOf("(")+1, torchData.lastIndexOf(")")));
         
         LWM2Mdevice device = devicesList.getDeviceByName(name);
-        device.torch((mode != 0));
+        if(device != null) device.torch((mode != 0));
         
         //System.out.println("------------------");
         response.setContentType(MIMEtype.getMIME(HTML_MIME_TYPE));

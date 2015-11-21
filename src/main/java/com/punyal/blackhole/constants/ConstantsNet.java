@@ -36,11 +36,24 @@ public class ConstantsNet {
     public static final String COAP_RESOURCE_RMS = "/acc/rms";
     public static final String COAP_RESOURCE_ROCKBOLT = "/Rockbolt";
     public static final String COAP_RESOURCE_BOLTFAILURE = "/3200/0/5500";
+    public static final String COAP_RESOURCE_BATTERY = "/power";
     
     // LWM2M
     public static final String LWM2M_SERVER_IP = "localhost";
     public static final int LWM2M_SERVER_PORT = COAP_DEFAULT_PORT;
     public static final String LWM2M_SERVER_RESOURCE_RD = "/rd";
     public static final int LWM2M_TIMEOUT = 40000; // 35s
+    
+    
+    // Web
+    public static final String RB_NAME = "name";
+    public static final String RB_ADDRESS = "address";
+    public static final String RB_BATTERY = "battery";
+    public static final String RB_IN = "in_com";
+    public static final String RB_OUT = "out_com";
+    public static final String RB_VIBRATION = "vibration";
+    public static final String RB_STRAIN = "strain";
+    public static final String RB_STATUS = "status";
+    public static final String RB_LAST_CONNECTION = "last_con";
     
 }

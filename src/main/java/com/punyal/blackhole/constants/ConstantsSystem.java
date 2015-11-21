@@ -30,6 +30,9 @@ package com.punyal.blackhole.constants;
 public class ConstantsSystem {
     public ConstantsSystem(){}
     
+    // BLACK HOLE
+    public static final String BH_VERSION = "0.2";
+    
     // DB
     public static final int DATA_BASE_BUFFER_TIME = 30000; // 30 s
     public static final int DATA_BASE_MAX_SIZE = 20;

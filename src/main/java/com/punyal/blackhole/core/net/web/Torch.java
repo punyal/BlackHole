@@ -26,6 +26,7 @@ package com.punyal.blackhole.core.net.web;
 import static com.punyal.blackhole.constants.ConstantsNet.COAP_RESOURCE_ROCKBOLT;
 import static com.punyal.blackhole.constants.ConstantsSystem.*;
 import com.punyal.blackhole.core.net.EndPoint;
+import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
 import java.net.Inet6Address;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -35,12 +36,12 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class Torch extends Thread {
-    private final EndPoint endPoint;
+    private final LWM2Mdevice device;
     private final boolean mode;
     private CoapClient coapClient;
     
-    public Torch(EndPoint endPoint, boolean mode) {
-        this.endPoint = endPoint;
+    public Torch(LWM2Mdevice device, boolean mode) {
+        this.device = device;
         this.mode = mode;
         setDaemon(true);
     }
@@ -52,11 +53,13 @@ public class Torch extends Thread {
     @Override
     public void run() {
         try {
+            device.increaseMessageOut();
             String uri;
-            if (endPoint.getInetAddress() instanceof Inet6Address)
-                uri = "coap://["+endPoint.getAddress()+"]:"+endPoint.getPort()+COAP_RESOURCE_ROCKBOLT;
+            if (device.getEndPoint().getInetAddress() instanceof Inet6Address)
+                uri = "coap://["+device.getEndPoint().getAddress()+"]:"+device.getEndPoint().getPort()+COAP_RESOURCE_ROCKBOLT;
             else
-                uri = "coap://"+endPoint.getAddress()+":"+endPoint.getPort()+COAP_RESOURCE_ROCKBOLT;
+                uri = "coap://"+device.getEndPoint().getAddress()+":"+device.getEndPoint().getPort()+COAP_RESOURCE_ROCKBOLT;
+            
             coapClient = new CoapClient(uri);
             coapClient.useCONs();
             //System.out.println(coapClient.getURI());

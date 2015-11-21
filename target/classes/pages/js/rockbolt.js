@@ -4,63 +4,49 @@
  *  @author: Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 
-var TotalConnected = 0;
-
-function sendAlarm() {
-  window.alert("ALARM");
-  $('#RockBolt-281').remove();
-}
 
 function getGraph(name) {
     window.alert("getGraph of "+name);
 }
 
+
 function torch(name, mode) {
-    console.log("Torch ON for "+name+" mode "+mode);
+    console.log("Torch for "+name+" mode "+mode);
     var jSonReq = {"torchdata": name+"("+mode+")"};
     $.ajax({
-    url: "torch",
-    type: 'post',
-    dataType: 'json',
-    data: jSonReq
-  });
+        url: "torch",
+        type: 'post',
+        dataType: 'json',
+        data: jSonReq
+    });
 }
 
-
-function newRockbolt(name, address, messages, alarms) {
-    TotalConnected++;
-    $('#listRockBolts').append('<tr id="'+name+'"><th>'+name+'</th><td id="'+name+'address">'+address+'</td><td id="'+name+'messages">'+messages+'</td><td id="'+name+'alarms">'+alarms+'</td><td><a href="" class="btnSmall" onclick="getGraph(\''+name+'\');">Select</a></td><td><a href="#" class="btnTiny" onclick="torch(\''+name+'\',1);">ON</a> <a href="#" class="btnTiny" onclick="torch(\''+name+'\',0);">OFF</a></td></tr>');
-}
-
-function updateRockbolt(name, address, messages, alarms) {
-    TotalConnected++;
-    $('#'+name+'address').text(address);
-    $('#'+name+'messages').text(messages);
-    $('#'+name+'alarms').text(alarms);
-}
-
-function getListOfRockBolts() {
+function getServerInfo() {
+    /**
+     * Incomming data expected:
+     *  {
+     *      "version": 0.2,
+     *      "dateTime": "Y-M-d h:m:s z",
+     *      "devicesConnected": 4,
+     *      "totalAlarms": 1,
+     *      "totalMessages": 123,
+     *      "criticalAlertMessage": "RockBolt-204 broken!!"
+     *  } 
+     */
   $.ajax({
-    url: "listOfRockBolts",
+    url: "getServerInfo",
     type: 'POST',
     dataType: 'json',
     contentType: 'application/json',
     mimeType: 'application/json',
 
     success: function (data) {
-      $('#serverTime').text(data.time_date);
-      console.log(data.time_date);
-      $('#rockBoltsConnected').text(data.devices.length);
-      
-      if (TotalConnected > data.devices.length) {
-          $('#listRockBolts').text("");
-          TotalConnected = 0;
-      }
-      
-      for (var i=0; i<data.devices.length;i++) {
-          if($('#'+data.devices[i].name).length < 1) newRockbolt(data.devices[i].name,data.devices[i].address, data.devices[i].messages, data.devices[i].alarms);
-          else updateRockbolt(data.devices[i].name,data.devices[i].address, data.devices[i].messages, data.devices[i].alarms);
-      }
+      $('#version').text(data.version);
+      $('#dateTime').text(data.dateTime);
+      $('#devicesConnected').text(data.devicesConnected);
+      $('#totalAlarms').text(data.totalAlarms);
+      $('#totalMessages').text(data.totalMessages);
+      $('#criticalAlertMessage').text(data.criticalAlertMessage);
     },
     error: function (data, status, er) {
       console.log("error: "+data+" status: "+status+" er:"+er);
@@ -68,13 +54,138 @@ function getListOfRockBolts() {
   });
 }
 
+function newRB(name, address, battery, in_com, out_com, vibration, strain, status, lastCon) {
+    $('#RockBoltsList').append(
+                '<tr id="'+name+'">'+
+                    '<td>'+name+'</td>'+
+                    '<td id="'+name+'Address">'+address+'</td>'+
+                    '<td id="'+name+'Battery">'+battery+'</td>'+
+                    '<td id="'+name+'In">'+in_com+'</td>'+
+                    '<td id="'+name+'Out">'+out_com+'</td>'+
+                    '<td id="'+name+'Vibration">'+vibration+'</td>'+
+                    '<td id="'+name+'Strain">'+strain+'</td>'+
+                    '<td>'+
+                        '<button class="btn btn-success" onclick="torch(\''+name+'\',1);"><i class="icon-eye-open"></i> ON</button>'+
+                        '<button class="btn btn-danger" onclick="torch(\''+name+'\',0);"><i class="icon-eye-close"></i> OFF</button>'+
+                    '</td>'+
+                    '<td>'+
+                    '<button class="btn btn-primary" onclick="getGraph(\''+name+'\');"><i class="icon-ok"></i> Select</button>'+
+                    '</td>'+
+                    '<td id="'+name+'Status">'+status+'</td>'+
+                    '<td id="'+name+'LastCon">'+lastCon+'</td>'+
+                '</tr>');
+}
+
+function updateRB(name, address, battery, in_com, out_com, vibration, strain, status, lastCon) {    
+    if ($('#'+name+'Address').text().localeCompare(address) !== 0) $('#'+name+'Address').text(address);
+    if ($('#'+name+'Battery').text().localeCompare(battery) !== 0) $('#'+name+'Battery').text(battery);
+    if ($('#'+name+'In').text().localeCompare(in_com) !== 0) $('#'+name+'In').text(in_com);
+    if ($('#'+name+'Out').text().localeCompare(out_com) !== 0) $('#'+name+'Out').text(out_com);
+    if ($('#'+name+'Vibration').text().localeCompare(vibration) !== 0) $('#'+name+'Vibration').text(vibration);
+    if ($('#'+name+'Strain').text().localeCompare(strain) !== 0) $('#'+name+'Strain').text(strain);
+    if ($('#'+name+'LastCon').text().localeCompare(lastCon) !== 0) $('#'+name+'LastCon').text(lastCon);
+    if ($('#'+name+'Status').text().localeCompare(status) !== 0) {
+        $('#'+name).empty();
+        if (status.localeCompare("Offline")) {
+            console.log(name+" changes to Online");
+            $('#'+name).append('<td>'+name+'</td>'+
+                    '<td id="'+name+'Address">'+address+'</td>'+
+                    '<td id="'+name+'Battery">'+battery+'</td>'+
+                    '<td id="'+name+'In">'+in_com+'</td>'+
+                    '<td id="'+name+'Out">'+out_com+'</td>'+
+                    '<td id="'+name+'Vibration">'+vibration+'</td>'+
+                    '<td id="'+name+'Strain">'+strain+'</td>'+
+                    '<td>'+
+                        '<button class="btn btn-success" onclick="torch(\''+name+'\',1);"><i class="icon-eye-open"></i> ON</button>'+
+                        '<button class="btn btn-danger" onclick="torch(\''+name+'\',0);"><i class="icon-eye-close"></i> OFF</button>'+
+                    '</td>'+
+                    '<td>'+
+                    '<button class="btn btn-primary" onclick="getGraph(\''+name+'\');"><i class="icon-ok"></i> Select</button>'+
+                    '</td>'+
+                    '<td id="'+name+'Status">'+status+'</td>'+
+                    '<td id="'+name+'LastCon">'+lastCon+'</td>');
+        } else {
+            console.log(name+" changes to Offline");
+            $('#'+name).append('<td>'+name+'</td>'+
+                    '<td id="'+name+'Address">'+address+'</td>'+
+                    '<td id="'+name+'Battery">'+battery+'</td>'+
+                    '<td id="'+name+'In">'+in_com+'</td>'+
+                    '<td id="'+name+'Out">'+out_com+'</td>'+
+                    '<td id="'+name+'Vibration">'+vibration+'</td>'+
+                    '<td id="'+name+'Strain">'+strain+'</td>'+
+                    '<td></td>'+
+                    '<td></td>'+
+                    '<td id="'+name+'Status">'+status+'</td>'+
+                    '<td id="'+name+'LastCon">'+lastCon+'</td>');
+        }
+        
+        
+    }
+}
+
+function getRockBoltsList() {
+    /**
+     * Incomming data expected:
+     *  {
+     *      "devices": [
+     *          {
+     *              "name": "\"RockBolt-240\"",
+     *              "address": "fdfd:0:0:0:5c0c:7122:c2df:4a58",
+     *              "battery": "12%",
+     *              "in_com": 123,
+     *              "out_com": 23,
+     *              "vibration": 34,
+     *              "strain": 21,
+     *              "status": "Online",
+     *              "last_con": "2015-11-21 13:59:02 CET"
+     *          }
+     *      ]
+     *  }
+     */
+  $.ajax({
+    url: "getRockBoltsList",
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json',
+    mimeType: 'application/json',
+
+    success: function (data) {
+        for (var i=0; i<data.devices.length ;i++) {
+            if ($('#'+data.devices[i].name).length < 1)
+                newRB(data.devices[i].name,
+                      data.devices[i].address,
+                      data.devices[i].battery,
+                      data.devices[i].in_com,
+                      data.devices[i].out_com,
+                      data.devices[i].vibration,
+                      data.devices[i].strain,
+                      data.devices[i].status,
+                      data.devices[i].last_con);
+            else updateRB(data.devices[i].name,
+                          data.devices[i].address,
+                          data.devices[i].battery,
+                          data.devices[i].in_com,
+                          data.devices[i].out_com,
+                          data.devices[i].vibration,
+                          data.devices[i].strain,
+                          data.devices[i].status,
+                          data.devices[i].last_con);
+        }
+        
+    },
+    error: function (data, status, er) {
+      console.log("error: "+data+" status: "+status+" er:"+er);
+    }
+  });
+}
+
+
 $(document).ready(function() {
   setInterval(function() {
-    getListOfRockBolts();
+    getServerInfo();
   }, 1000);
-
-  /*setTimeout(function() {
-    $('#listRockBolts').append('<th>RockBolt-282</th><td>fdfd:0:0:0:180b:70d7:fdb4:9fbc</td><td><a href="#" class="btnSmall">Select</a></td><td><a href="#" class="btnTiny" onclick="sendAlarm();">HERE</a> <a href="#" class="btnTiny">OFF</a></td></tr>');
-
-  }, 2000);*/
+  
+  setInterval(function() {
+    getRockBoltsList();
+  }, 1000);
 });

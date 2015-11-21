@@ -55,7 +55,7 @@ public class WebServer {
         System.out.println("Starting Server at: " + server.getURI());
         try {
             server.start();
-            server.join();
+            //server.join();
         } catch (Exception ex) {
             Logger.getLogger(WebServer.class.getName()).log(Level.SEVERE, null, ex);
         }

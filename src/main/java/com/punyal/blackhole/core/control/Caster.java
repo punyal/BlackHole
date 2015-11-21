@@ -52,6 +52,7 @@ public class Caster extends Thread {
     @Override
     public void run() {
         try {
+            device.increaseMessageOut();
             String uri;
             
             if (device.getEndPoint().getInetAddress() instanceof Inet6Address)

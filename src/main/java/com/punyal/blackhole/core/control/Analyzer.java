@@ -71,7 +71,7 @@ public class Analyzer extends Thread {
                 while ((incomingData = incomingDB.getFirst()) != null) {
                     resource = incomingData.resource;
                     //System.out.println(incomingData.name+"]resource:"+resource+" Data:"+incomingData.response);
-                    devicesList.getDeviceByName(incomingData.name).increaseMessagesTotal();
+                    devicesList.getDeviceByName(incomingData.name).increaseMessageIn();
                     if (incomingData.response != null) {
                         switch (resource) {
                             case COAP_RESOURCE_STRAIN:
@@ -81,7 +81,7 @@ public class Analyzer extends Thread {
                                 name = incomingData.name;
                                 timestamp = incomingData.timestamp;
                                 alarm = Integer.parseInt(json.get("alarm").toString());
-                                if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmTotal();
+                                if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsStrain();
                                 strainDB.addData(new StrainData(
                                         name,
                                         timestamp,
@@ -96,7 +96,7 @@ public class Analyzer extends Thread {
                                 name = incomingData.name;
                                 timestamp = incomingData.timestamp;
                                 alarm = Integer.parseInt(json.get("a").toString());
-                                if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmTotal();
+                                if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsVibration();
                                 rmsDB.addData(new RMSdata(
                                         name,
                                         timestamp,

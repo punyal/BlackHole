@@ -38,6 +38,7 @@ public class RockboltClient extends Thread {
     private boolean running;
     private final CoapObserver strainObserver;
     private final CoapObserver rmsObserver;
+    private final CoapObserver batteryObserver;
     
     
     public RockboltClient(final LWM2Mdevice device) {
@@ -70,6 +71,21 @@ public class RockboltClient extends Thread {
                 System.out.println("Error RMS resource on "+device.getName());
             }
         };
+        
+        batteryObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_BATTERY) {
+            
+            @Override
+            public void incomingData(CoapResponse response) {
+                if (!response.getResponseText().isEmpty()) {
+                    System.out.println(response.getResponseText());
+                }
+            }
+            
+            @Override
+            public void error() {
+                System.out.println("Error RMS resource on "+device.getName());
+            }
+        };
     }
     
     public void startThread() {
@@ -77,12 +93,14 @@ public class RockboltClient extends Thread {
         //System.out.println("starting observe");
         strainObserver.startObserve();
         rmsObserver.startObserve();
+        batteryObserver.startObserve();
     }
     
     public void stopThread() {
         running = false;
         strainObserver.stopObserver();
         rmsObserver.stopObserver();
+        batteryObserver.stopObserver();
     }
     
     @Override

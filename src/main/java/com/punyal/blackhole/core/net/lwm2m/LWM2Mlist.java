@@ -65,5 +65,25 @@ public class LWM2Mlist {
         return list;
     }
     
+    public int getNumberOnlineDevices() {
+        int dev = 0;
+        for (LWM2Mdevice device: list)
+            if (device.isAlive()) dev++;
+        return dev;
+    }
     
+    public int getTotalAlarms() {
+        int alarms = 0;
+        for (LWM2Mdevice device: list)
+            alarms += device.getAlarmsStrain() + device.getAlarmsVibration();
+        return alarms;
+    }
+    
+    public int getTotalMessages() {
+        int messages = 0;
+        for (LWM2Mdevice device: list)
+            messages += device.getMessageIn()+ device.getMessageOut();
+        return messages;
+    }
+        
 } 
