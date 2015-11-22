@@ -41,25 +41,32 @@ function bootVibrationStrainChart() {
             }
         }
     };
-    var groups = new vis.DataSet();
-    groups.add({
+    var vibrationGroups = new vis.DataSet();
+    vibrationGroups.add({
     id: 0,
     content: 'X',
     options: {
     }});
-    groups.add({
+    vibrationGroups.add({
     id: 1,
     content: 'Y',
     options: {
     }});
-    groups.add({
+    vibrationGroups.add({
     id: 2,
     content: 'Z',
     options: {
     }});
+
+    var strainGroups = new vis.DataSet();
+    strainGroups.add({
+        id: 0,
+        content: 'strain',
+        options: {}
+    });
     
     
-    vibrationChart = new vis.Graph2d(vibrationContainer, vibrationData, groups, vibrationOptions);
+    vibrationChart = new vis.Graph2d(vibrationContainer, vibrationData, vibrationGroups, vibrationOptions);
     var strainOptions = {
         dataAxis: {
             left: {
@@ -67,7 +74,7 @@ function bootVibrationStrainChart() {
             }
         }
     };
-    strainChart = new vis.Graph2d(strainContainer, strainData, strainOptions);
+    strainChart = new vis.Graph2d(strainContainer, strainData, strainGroups, strainOptions);
     var actualTime = Date.now();
     var prevTime = new Date();
     prevTime.setMinutes(prevTime.getMinutes() - 4);
@@ -87,6 +94,9 @@ function getVibrationStrainData() {
        data: jSonReq,
         success: function (data) {
             
+            vibrationData.remove(vibrationData.getIds());
+            strainData.remove(strainData.getIds());
+            
             for (var i=0; i<data.vibration.length ;i++) {
                 vibrationData.add([{x: new Date(data.vibration[i].time) , y: data.vibration[i].X, group: 0}]);
                 vibrationData.add([{x: new Date(data.vibration[i].time) , y: data.vibration[i].Y, group: 1}]);
@@ -94,7 +104,7 @@ function getVibrationStrainData() {
             }
             
             for (var i=0; i<data.strain.length ;i++) {
-                strainData.add([{x: new Date(data.strain[i].time) , y: data.strain[i].strain}]);
+                strainData.add([{x: new Date(data.strain[i].time) , y: data.strain[i].strain, group: 0}]);
             }
         },
         error: function (data, status, er) {
