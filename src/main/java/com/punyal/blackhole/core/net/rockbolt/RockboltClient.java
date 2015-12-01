@@ -26,6 +26,7 @@ package com.punyal.blackhole.core.net.rockbolt;
 import static com.punyal.blackhole.constants.ConstantsNet.*;
 import com.punyal.blackhole.core.net.CoapObserver;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import com.punyal.blackhole.tentacle.Ticket;
 import com.punyal.blackhole.utils.Parsers;
 import org.eclipse.californium.core.CoapResponse;
 import org.json.simple.JSONObject;
@@ -37,17 +38,19 @@ import org.json.simple.JSONObject;
  */
 public class RockboltClient extends Thread {
     private final  LWM2Mdevice device;
+    private final Ticket myTicket;
     private boolean running;
     private final CoapObserver strainObserver;
     private final CoapObserver rmsObserver;
     private final CoapObserver batteryObserver;
     
     
-    public RockboltClient(final LWM2Mdevice device) {
+    public RockboltClient(Ticket myTicket, final LWM2Mdevice device) {
+        this.myTicket = myTicket;
         this.device = device;
         this.setDaemon(true);
         running = true;
-        strainObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_STRAIN) {
+        strainObserver = new CoapObserver(myTicket, device.getEndPoint(), COAP_RESOURCE_STRAIN) {
             
             @Override
             public void incomingData(CoapResponse response) {
@@ -67,7 +70,7 @@ public class RockboltClient extends Thread {
                 System.out.println("Error Strain resource on "+device.getName());
             }
         };
-        rmsObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_RMS) {
+        rmsObserver = new CoapObserver(myTicket, device.getEndPoint(), COAP_RESOURCE_RMS) {
             
             @Override
             public void incomingData(CoapResponse response) {
@@ -87,7 +90,7 @@ public class RockboltClient extends Thread {
             }
         };
         
-        batteryObserver = new CoapObserver(device.getEndPoint(), COAP_RESOURCE_BATTERY) {
+        batteryObserver = new CoapObserver(myTicket, device.getEndPoint(), COAP_RESOURCE_BATTERY) {
             
             @Override
             public void incomingData(CoapResponse response) {

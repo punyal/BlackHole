@@ -31,6 +31,7 @@ import com.punyal.blackhole.core.data.RMSdataBase;
 import com.punyal.blackhole.core.data.StrainDataBase;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mserver;
 import com.punyal.blackhole.core.net.web.WebServer;
+import com.punyal.blackhole.tentacle.Tentacle;
 
 /**
  *
@@ -44,14 +45,18 @@ public class BlackHole implements Runnable {
     private final LWM2Mserver lwm2mServer;
     private final Analyzer analyzer;
     private final WebServer webServer;
+    private final Tentacle tentacle;
     
     public BlackHole() {
+        tentacle = new Tentacle();
+        tentacle.startThread();
+        
         eventDB = new EventDataBase();
         incomingDB = new IncomingDataBase();
         strainDB = new StrainDataBase();
         rmsDB = new RMSdataBase();
-        lwm2mServer = new LWM2Mserver(incomingDB, eventDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
-        analyzer = new Analyzer(eventDB, incomingDB, strainDB, rmsDB, lwm2mServer.getDevices());
+        lwm2mServer = new LWM2Mserver(tentacle.getMyTicket(), incomingDB, eventDB, LWM2M_SERVER_IP, LWM2M_SERVER_PORT);
+        analyzer = new Analyzer(tentacle.getMyTicket(), eventDB, incomingDB, strainDB, rmsDB, lwm2mServer.getDevices());
         analyzer.startThread();
         webServer = new WebServer(lwm2mServer.getDevices(), eventDB);
     }
@@ -59,14 +64,21 @@ public class BlackHole implements Runnable {
     public void start() {
         System.out.println("BlackHole: Starting...");
         eventDB.addEvent("BackHole: ON");
-        lwm2mServer.start();
+        //lwm2mServer.start();
         run();
     }
 
     @Override
     public void run() {
+        boolean authenticated = false;
         try {
             while (true) {
+                if (authenticated == false && tentacle.getMyTicket().getTicket()!=null) {
+                    System.out.println("starting");
+                    lwm2mServer.start();
+                    authenticated = true;
+                }
+                //if (tentacle.getTicket()!= null) lwm2mServer.start();
                 //System.out.println("Devices: "+lwm2mServer.getDevices().size());
                 //System.out.println("IncomingDB:"+incomingDB.size()+" StrainDB:"+strainDB.size()+" rmsDB:"+rmsDB.size());
                 //rmsDB.printAll();

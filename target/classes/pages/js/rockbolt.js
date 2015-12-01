@@ -187,6 +187,8 @@ function torch(name, mode) {
     });
 }
 
+var criticalMessage = "";
+
 function getServerInfo() {
     /**
      * Incomming data expected:
@@ -213,6 +215,10 @@ function getServerInfo() {
       $('#totalAlarms').text(data.totalAlarms);
       $('#totalMessages').text(data.totalMessages);
       $('#criticalAlertMessage').text(data.criticalAlertMessage);
+        if(criticalMessage.localeCompare(data.criticalAlertMessage)) {
+            criticalMessage = data.criticalAlertMessage;
+            window.alert(criticalMessage);
+        }
     },
     error: function (data, status, er) {
       console.log("error: "+data+" status: "+status+" er:"+er);

@@ -26,6 +26,7 @@ package com.punyal.blackhole.core.net.lwm2m;
 import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.net.EndPoint;
+import com.punyal.blackhole.tentacle.Ticket;
 import java.net.InetAddress;
 
 /**
@@ -36,14 +37,14 @@ public class LWM2Mserver {
     private final EndPoint endPoint;
     private final LWM2Mlist devicesList;
     
-    public LWM2Mserver(IncomingDataBase incomingDB, EventDataBase eventDB, InetAddress address, int port) {
+    public LWM2Mserver(Ticket myTicket, IncomingDataBase incomingDB, EventDataBase eventDB, InetAddress address, int port) {
         endPoint = new EndPoint(address, port);
-        devicesList = new LWM2Mlist(incomingDB, eventDB);
+        devicesList = new LWM2Mlist(myTicket, incomingDB, eventDB);
     }
     
-    public LWM2Mserver(IncomingDataBase incomingDB, EventDataBase eventDB, String host, int port) {
+    public LWM2Mserver(Ticket myTicket, IncomingDataBase incomingDB, EventDataBase eventDB, String host, int port) {
         endPoint = new EndPoint(host, port);
-        devicesList = new LWM2Mlist(incomingDB, eventDB);
+        devicesList = new LWM2Mlist(myTicket, incomingDB, eventDB);
     }
     
     public void start() {

@@ -32,6 +32,7 @@ import com.punyal.blackhole.core.data.RMSdataBase;
 import com.punyal.blackhole.core.data.StrainData;
 import com.punyal.blackhole.core.data.StrainDataBase;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
+import com.punyal.blackhole.tentacle.Ticket;
 import com.punyal.blackhole.utils.Parsers;
 import org.json.simple.JSONObject;
 
@@ -40,18 +41,20 @@ import org.json.simple.JSONObject;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class Analyzer extends Thread {
+    private final EventDataBase eventDB;
     private final IncomingDataBase incomingDB;
     private final StrainDataBase strainDB;
     private final RMSdataBase rmsDB;
     private final Alarmer alarmer;
     private final LWM2Mlist devicesList;
     
-    public Analyzer(EventDataBase eventDB, IncomingDataBase incomingDB, StrainDataBase strainDB, RMSdataBase rmsDB, LWM2Mlist devicesList) {
+    public Analyzer(Ticket myTicket, EventDataBase eventDB, IncomingDataBase incomingDB, StrainDataBase strainDB, RMSdataBase rmsDB, LWM2Mlist devicesList) {
         this.incomingDB = incomingDB;
+        this.eventDB = eventDB;
         this.strainDB = strainDB;
         this.rmsDB = rmsDB;
         this.devicesList = devicesList;
-        alarmer = new Alarmer(devicesList, eventDB);
+        alarmer = new Alarmer(myTicket, devicesList, eventDB);
         alarmer.startThread();
         this.setDaemon(true);
     }
@@ -83,6 +86,7 @@ public class Analyzer extends Thread {
                                     timestamp = incomingData.timestamp;
                                     alarm = Integer.parseInt(json.get("alarm").toString());
                                     if (alarm > 0) devicesList.getDeviceByName(name).increaseAlarmsStrain();
+                                    if (alarm > 1) eventDB.setCriticalMessage(name+" is broken!");
                                     strainDB.addData(new StrainData(
                                             name,
                                             timestamp,

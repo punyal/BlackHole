@@ -26,6 +26,7 @@ package com.punyal.blackhole.core.control;
 import static com.punyal.blackhole.constants.ConstantsNet.*;
 import static com.punyal.blackhole.constants.ConstantsSystem.*;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import com.punyal.blackhole.tentacle.Ticket;
 import java.net.Inet6Address;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -35,11 +36,13 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class Caster extends Thread {
+    private final Ticket myTicket;
     private final LWM2Mdevice device;
     private final String resource;
     private final int alarmLevel;
     
-    public Caster(LWM2Mdevice device, String resource, int alarmLevel) {
+    public Caster(Ticket myTicket, LWM2Mdevice device, String resource, int alarmLevel) {
+        this.myTicket = myTicket;
         this.device = device;
         this.resource = resource;
         this.alarmLevel = alarmLevel;
@@ -73,7 +76,7 @@ public class Caster extends Thread {
                     if (resource.equals(COAP_RESOURCE_STRAIN)) alarmMessage = ALARM_MESSAGE_STRAIN_LEVEL_1;
                     break;
             }
-            coapClient.post(alarmMessage, MediaTypeRegistry.TEXT_PLAIN);
+            coapClient.post(myTicket.getTicket(), alarmMessage, MediaTypeRegistry.TEXT_PLAIN);
             //System.out.println("MESSAGE: "+alarmMessage);
             //System.out.println(coapClient.toString());
             

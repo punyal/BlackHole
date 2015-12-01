@@ -26,6 +26,7 @@ package com.punyal.blackhole.core.net.lwm2m;
 import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.data.IncomingDataBase;
 import com.punyal.blackhole.core.net.EndPoint;
+import com.punyal.blackhole.tentacle.Ticket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,11 +35,13 @@ import java.util.List;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class LWM2Mlist {
+    private final Ticket myTicket;
     private final IncomingDataBase incomingDB;
     private final EventDataBase eventDB;
     private final List<LWM2Mdevice> list;
 
-    public LWM2Mlist(IncomingDataBase incomingDB, EventDataBase eventDB) {
+    public LWM2Mlist(Ticket myTicket, IncomingDataBase incomingDB, EventDataBase eventDB) {
+        this.myTicket = myTicket;
         this.eventDB = eventDB;
         this.incomingDB = incomingDB;
         list = new ArrayList<>();
@@ -57,7 +60,7 @@ public class LWM2Mlist {
     }
     
     public void addDevice(String name, String id, String host, int port) {
-        LWM2Mdevice device = new LWM2Mdevice(eventDB, new EndPoint(host, port), name, id);
+        LWM2Mdevice device = new LWM2Mdevice(myTicket, eventDB, new EndPoint(host, port), name, id);
         device.setAlive(incomingDB);
         list.add(device);
         

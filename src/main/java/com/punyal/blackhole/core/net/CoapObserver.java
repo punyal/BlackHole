@@ -23,6 +23,8 @@
  */
 package com.punyal.blackhole.core.net;
 
+import com.punyal.blackhole.tentacle.Cryptonizer;
+import com.punyal.blackhole.tentacle.Ticket;
 import java.net.Inet6Address;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.CoapHandler;
@@ -39,8 +41,10 @@ public abstract class CoapObserver {
     private final CoapHandler coapHandler;
     private CoapObserveRelation relation;
     private final String resource;
+    private final Ticket myTicket;
     
-    public CoapObserver(EndPoint endPoint, String resource) {
+    public CoapObserver(Ticket myTicket, EndPoint endPoint, String resource) {
+        this.myTicket = myTicket;
         this.endPoint = endPoint;
         this.resource = resource;
         coapHandler = new CoapHandler() {
@@ -64,7 +68,8 @@ public abstract class CoapObserver {
         coapClient = new CoapClient(uri);
         coapClient.setTimeout(60000);
         //System.out.println("Starting Observe: "+coapClient.getURI());
-        relation = coapClient.observe(coapHandler);
+        System.out.println("Observing with:"+Cryptonizer.ByteArray2Hex(myTicket.getTicket()));
+        relation = coapClient.observe(myTicket.getTicket(),coapHandler);
     }
     
     public void stopObserver() {

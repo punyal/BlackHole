@@ -26,6 +26,7 @@ package com.punyal.blackhole.core.control;
 import static com.punyal.blackhole.constants.ConstantsNet.*;
 import com.punyal.blackhole.core.data.EventDataBase;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
+import com.punyal.blackhole.tentacle.Ticket;
 
 /**
  *
@@ -37,11 +38,11 @@ public class Alarmer extends Thread {
     private final AlarmCollector alarmStrain;
     private final Multicaster multicaster;
     
-    public Alarmer(LWM2Mlist devicesList, EventDataBase eventDB) {
+    public Alarmer(Ticket myTicket, LWM2Mlist devicesList, EventDataBase eventDB) {
         this.eventDB = eventDB;
         alarmRMS = new AlarmCollector();
         alarmStrain = new AlarmCollector();
-        multicaster = new Multicaster(devicesList);
+        multicaster = new Multicaster(myTicket, devicesList);
         setDaemon(true);
     }
     

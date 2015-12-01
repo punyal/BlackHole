@@ -21,45 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.punyal.blackhole.core.control;
-
-import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
-import com.punyal.blackhole.core.net.lwm2m.LWM2Mlist;
-import com.punyal.blackhole.tentacle.Ticket;
-import java.util.ArrayList;
-import java.util.List;
+package com.punyal.blackhole.tentacle;
 
 /**
  *
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
-public class Multicaster {
-    private final Ticket myTicket;
-    private final LWM2Mlist devicesList;
+public class Ticket {
+    private byte ticket[];
+    private String authenticator;
+    private long expireTime;
     
-    public Multicaster(Ticket myTicket, LWM2Mlist devicesList) {
-        this.myTicket = myTicket;
-        this.devicesList = devicesList;
+    public Ticket() {
+        ticket = null;
+        authenticator = null;
+        expireTime = 0;
     }
     
-    public void newMulticaster(List<String> exceptDevices, String resource, int alarmLevel) {
-        boolean send;
-        Caster caster;
-        List<LWM2Mdevice> toSendList =new ArrayList<>();
-        
-        for (LWM2Mdevice device: devicesList.getDevices()) {
-            send = true;
-            for (String except: exceptDevices) {
-                if (except.equals(device.getName()))
-                    send = false;
-            }
-            if (send) toSendList.add(device);
-        }
-        
-        for (LWM2Mdevice device: toSendList) {
-            //System.out.println(device.getName());
-            caster = new Caster(myTicket, device, resource, alarmLevel);
-            caster.startThread();
-        }
+    public void reset() {
+        ticket = null;
+        authenticator = null;
+        expireTime = 0;
     }
+    
+    public void setTicket(byte[] ticket) {
+        this.ticket = ticket;
+    }
+    
+    public byte[] getTicket() {
+        return ticket;
+    }
+    
+    public void setAuthenticator(String authenticator) {
+        this.authenticator = authenticator;
+    }
+    
+    public String getAuthenticator() {
+        return authenticator;
+    }
+    
+    public void setExpireTime(long expireTime) {
+        this.expireTime = System.currentTimeMillis()+expireTime;
+    }
+    
+    public long getExpireTime() {
+        return expireTime;
+    }
+    
 }

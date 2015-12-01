@@ -172,7 +172,7 @@ public class WebHandler extends AbstractHandler{
         json.put("devicesConnected", devicesList.getNumberOnlineDevices());
         json.put("totalAlarms", devicesList.getTotalAlarms());
         json.put("totalMessages", devicesList.getTotalMessages());
-        json.put("criticalAlertMessage", "");
+        json.put("criticalAlertMessage", eventDB.getCriticalMessage());
         
         
         response.setContentType(MIMEtype.getMIME(JSON_MIME_TYPE));
@@ -300,7 +300,7 @@ public class WebHandler extends AbstractHandler{
                 tmp.put("Z", Math.sqrt(data.Z));
                 list.add(tmp);
                 
-                System.out.println(data.X+ " "+ Math.sqrt(data.X));
+                //System.out.println(data.X+ " "+ Math.sqrt(data.X));
             }
             json.put("vibration", list);
             list = new JSONArray();

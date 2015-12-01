@@ -33,9 +33,19 @@ import java.util.List;
  */
 public class EventDataBase {
     private final List<EventData> list;
+    private String criticalMessage;
     
     public EventDataBase() {
         list = new ArrayList<>();
+        criticalMessage = "";
+    }
+    
+    synchronized public void setCriticalMessage(String message) {
+        criticalMessage = message;
+    }
+    
+    synchronized public String getCriticalMessage() {
+        return criticalMessage;
     }
     
     synchronized public void addEvent(String data) {

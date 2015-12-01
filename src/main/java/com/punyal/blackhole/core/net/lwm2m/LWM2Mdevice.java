@@ -33,6 +33,7 @@ import com.punyal.blackhole.core.data.StrainData;
 import com.punyal.blackhole.core.net.EndPoint;
 import com.punyal.blackhole.core.net.rockbolt.RockboltClient;
 import com.punyal.blackhole.core.net.web.Torch;
+import com.punyal.blackhole.tentacle.Ticket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import java.util.List;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class LWM2Mdevice {
+    private final Ticket myTicket;
     private final EventDataBase eventDB;
     private final EndPoint endPoint;
     private final String name;
@@ -64,7 +66,8 @@ public class LWM2Mdevice {
     
     
     
-    public LWM2Mdevice(EventDataBase eventDB, EndPoint endPoint, String name, String id) {
+    public LWM2Mdevice(Ticket myTicket, EventDataBase eventDB, EndPoint endPoint, String name, String id) {
+        this.myTicket = myTicket;
         this.eventDB = eventDB;
         this.endPoint = endPoint;
         this.name = name;
@@ -119,7 +122,7 @@ public class LWM2Mdevice {
             } else {
                 System.out.println(name+" [alive]");
             }
-            rockboltClient = new RockboltClient(this);
+            rockboltClient = new RockboltClient(myTicket, this);
             rockboltClient.startThread();
             this.incomingDB = incomingDB;
         }
@@ -140,7 +143,7 @@ public class LWM2Mdevice {
     }
     
     public void torch(boolean mode) {
-        Torch torchThread = new Torch(this, mode);
+        Torch torchThread = new Torch(myTicket, this, mode);
         torchThread.startThread();
     }
     

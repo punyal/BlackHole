@@ -27,6 +27,7 @@ import static com.punyal.blackhole.constants.ConstantsNet.COAP_RESOURCE_ROCKBOLT
 import static com.punyal.blackhole.constants.ConstantsSystem.*;
 import com.punyal.blackhole.core.net.EndPoint;
 import com.punyal.blackhole.core.net.lwm2m.LWM2Mdevice;
+import com.punyal.blackhole.tentacle.Ticket;
 import java.net.Inet6Address;
 import org.eclipse.californium.core.CoapClient;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
@@ -36,11 +37,13 @@ import org.eclipse.californium.core.coap.MediaTypeRegistry;
  * @author Pablo Puñal Pereira <pablo.punal@ltu.se>
  */
 public class Torch extends Thread {
+    private final Ticket myTicket;
     private final LWM2Mdevice device;
     private final boolean mode;
     private CoapClient coapClient;
     
-    public Torch(LWM2Mdevice device, boolean mode) {
+    public Torch(Ticket myTicket, LWM2Mdevice device, boolean mode) {
+        this.myTicket = myTicket;
         this.device = device;
         this.mode = mode;
         setDaemon(true);
@@ -69,7 +72,7 @@ public class Torch extends Thread {
             else torchMessage = TORCH_MESSAGE_OFF;
             //System.out.println("MESSAGE: "+torchMessage);
 
-            coapClient.post(torchMessage, MediaTypeRegistry.TEXT_PLAIN);
+            coapClient.post(myTicket.getTicket(),torchMessage, MediaTypeRegistry.TEXT_PLAIN);
             
         } finally {
             //System.out.println("Killing Torch...");
